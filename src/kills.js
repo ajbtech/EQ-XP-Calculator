@@ -2,17 +2,19 @@
 //
 // How many kills of a given mob each player needs to reach their next level.
 // Builds on awardXp: each player needs (xpToNextLevel - xpSoFar) more XP and
-// gains its award.xp per kill, so kills = ceil(remaining / xpPerKill). A mob
-// that awards 0 XP (deep green) can never level anyone -> Infinity.
+// gains its award.xp per kill (already clamped by the 11% per-mob cap), so
+// kills = ceil(remaining / xpPerKill). A mob that awards 0 XP (deep green) can
+// never level anyone -> Infinity.
 
 import { awardXp } from "./award.js";
 
 /**
  * @typedef {Object} PlayerKills
  * @property {object} character   the character
- * @property {number} xpPerKill   XP this character gains per kill
+ * @property {number} xpPerKill   XP this character gains per kill (capped)
  * @property {number} remaining   XP still needed to reach the next level
  * @property {number} kills       kills needed (Infinity if xpPerKill is 0)
+ * @property {boolean} capApplied true if the 11% per-mob cap clamped xpPerKill
  */
 
 /**
@@ -47,6 +49,7 @@ export function killsToNextLevel(characters, mobLevel, zem) {
       xpPerKill: a.xp,
       remaining,
       kills,
+      capApplied: a.capApplied,
     });
   });
 

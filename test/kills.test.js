@@ -35,6 +35,15 @@ test("kills track each player's own remaining XP and share", () => {
   assert.equal(result.players[1].kills, 32);
 });
 
+test("the 11% per-mob cap increases the kills needed", () => {
+  // L10 solo vs L20 mob, zem 100. Uncapped 40000 xp/kill -> ceil(271000/40000)
+  // = 7 kills, but the cap clamps to 29810 -> ceil(271000/29810) = 10 kills.
+  const result = killsToNextLevel([char(10)], 20, 100);
+  assert.ok(Math.abs(result.players[0].xpPerKill - 29810) < 1e-6);
+  assert.equal(result.players[0].capApplied, true);
+  assert.equal(result.players[0].kills, 10);
+});
+
 test("a deep-green mob (0 xp) means the level is never reached", () => {
   const result = killsToNextLevel([char(40), char(38)], 12, 86);
   assert.equal(result.total, 0);

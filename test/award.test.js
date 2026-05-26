@@ -39,6 +39,22 @@ test("XP is split proportionally to xpSoFar", () => {
   assert.ok(close(result.awards[1].xp, result.total * (8000 / 9000)));
 });
 
+test("caps a single kill at 11% of the player's current level", () => {
+  // L10 solo vs L20 red-con mob, zem 100: total = 20^2 * 100 = 40000.
+  // L10 level increment = 1000000 - 729000 = 271000, cap = 0.11 * 271000 =
+  // 29810, so the 40000 slice is clamped down to 29810.
+  const result = awardXp([char(10)], 20, 100);
+  assert.ok(close(result.total, 40000));
+  assert.ok(close(result.awards[0].xp, 29810));
+  assert.equal(result.awards[0].capApplied, true);
+});
+
+test("leaves XP uncapped when below the 11% threshold", () => {
+  const result = awardXp([char(30), char(30)], 30, 75);
+  assert.equal(result.awards[0].capApplied, false);
+  assert.ok(close(result.awards[0].xp, 34425));
+});
+
 test("a deep-green mob awards 0 to everyone", () => {
   const result = awardXp([char(40), char(38)], 12, 86);
   assert.equal(result.total, 0);
