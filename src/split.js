@@ -1,13 +1,18 @@
 // Pure XP-split module — no DOM, importable by the browser and node:test.
 //
 // Given 1-6 characters, allocate a kill's XP across them in proportion to each
-// character's xpToNextLevel (which already folds in the race/class modifier;
-// see src/character.js). A character that needs more XP to level takes a larger
-// share. This module reads only xpToNextLevel, so it is unaware of whether
-// class penalties are in effect.
+// character's xpSoFar (cumulative XP earned to reach the current level; see
+// src/character.js). A level-1 character has xpSoFar 0, which would hand it a
+// 0% share, so level-1 members are weighted as a flat 1000 instead. This module
+// reads only level and xpSoFar, so it is unaware of whether class penalties are
+// in effect.
 
 const MIN_PARTY = 1;
 const MAX_PARTY = 6;
+
+// A level-1 character has 0 cumulative XP; weight it as a baseline 1000 so it
+// still receives a share rather than 0%.
+const LEVEL_ONE_WEIGHT = 1000;
 
 /**
  * @typedef {Object} Allocation
@@ -16,11 +21,12 @@ const MAX_PARTY = 6;
  */
 
 /**
- * Split XP across characters proportionally to their xpToNextLevel.
- * @param {Array<{xpToNextLevel: number}>} characters 1-6 characters
+ * Split XP across characters proportionally to their xpSoFar (level-1 members
+ * weighted as 1000).
+ * @param {Array<{level: number, xpSoFar: number}>} characters 1-6 characters
  * @returns {ReadonlyArray<Allocation>} per-character shares, in input order
- * @throws {RangeError} if the count is out of 1-6 or any character lacks a
- *   positive, finite xpToNextLevel.
+ * @throws {RangeError} if the count is out of 1-6 or any character has an
+ *   invalid level or xpSoFar.
  */
 export function splitXp(characters) {
   if (!Array.isArray(characters)) {
@@ -34,20 +40,27 @@ export function splitXp(characters) {
     );
   }
 
-  characters.forEach((c, i) => {
-    const xp = c == null ? undefined : c.xpToNextLevel;
-    if (!Number.isFinite(xp) || xp <= 0) {
+  const weights = characters.map((c, i) => {
+    const level = c == null ? undefined : c.level;
+    const xpSoFar = c == null ? undefined : c.xpSoFar;
+    if (!Number.isInteger(level) || level < 1) {
       throw new RangeError(
-        `character ${i} must have a positive numeric xpToNextLevel, got ${JSON.stringify(xp)}`,
+        `character ${i} must have an integer level >= 1, got ${JSON.stringify(level)}`,
       );
     }
+    if (!Number.isFinite(xpSoFar) || xpSoFar < 0) {
+      throw new RangeError(
+        `character ${i} must have a finite xpSoFar >= 0, got ${JSON.stringify(xpSoFar)}`,
+      );
+    }
+    return level === 1 ? LEVEL_ONE_WEIGHT : xpSoFar;
   });
 
-  const total = characters.reduce((sum, c) => sum + c.xpToNextLevel, 0);
+  const total = weights.reduce((sum, w) => sum + w, 0);
 
   return Object.freeze(
-    characters.map((c) =>
-      Object.freeze({ character: c, share: c.xpToNextLevel / total }),
+    characters.map((c, i) =>
+      Object.freeze({ character: c, share: weights[i] / total }),
     ),
   );
 }
