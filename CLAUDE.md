@@ -83,8 +83,10 @@ Tests live in `test/` and run against the pure modules in `src/`. CI runs
 
 ## Conventions
 
+- This is an **open-source project**, MIT licensed. Develop in the open;
+  prefer clear, well-documented code and data that outside contributors can
+  understand and update.
 - HTML + vanilla JS (ES modules), zero build step.
 - Static JSON data lives in `data/`; keep it editable without code changes.
-- MIT licensed.
 - Honesty first: estimated values are labelled "(est.)" and results are
   described as approximate (see PLAN.md).
