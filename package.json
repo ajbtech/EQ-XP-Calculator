@@ -1,0 +1,21 @@
+{
+  "name": "eq-xp-calculator",
+  "version": "0.0.0",
+  "private": true,
+  "description": "An honest P99 EverQuest XP calculator (static web app).",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "globals": "^14.0.0",
+    "prettier": "^3.0.0"
+  }
+}

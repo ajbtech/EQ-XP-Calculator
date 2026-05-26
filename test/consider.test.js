@@ -95,13 +95,19 @@ test("blue/white/yellow/red modifier is always 1", () => {
 
 test("exact text examples per band", () => {
   assert.equal(consider(6, 6).text, "looks like an even fight");
-  assert.equal(consider(6, 9).text, "what would you like your tombstone to say?");
+  assert.equal(
+    consider(6, 9).text,
+    "what would you like your tombstone to say?",
+  );
   assert.equal(consider(8, 8).text, "looks kind of risky..you might win.");
   assert.equal(
     consider(29, 30).text,
-    "looks like it would wipe the floor with you!"
+    "looks like it would wipe the floor with you!",
   );
-  assert.equal(consider(29, 19).text, "This creature could pose problems, you would probably defeat it."); // -10
+  assert.equal(
+    consider(29, 19).text,
+    "This creature could pose problems, you would probably defeat it.",
+  ); // -10
 });
 
 // --- input validation ---------------------------------------------------
