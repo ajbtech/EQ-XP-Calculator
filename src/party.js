@@ -2,8 +2,9 @@
 //
 // Takes 1-6 race/class/level combos, validates each against the canonical
 // enums (src/enums.js) and the 1-60 level range, and returns an immutable
-// Party. The shape feeds the XP formula directly: `size` is the group size and
-// `levels`/`levelSum` drive the group-share term (see PLAN.md CalcInput).
+// Party. The shape feeds the XP formula directly: `size` is the group size,
+// `levels` are the member levels, and `maxLevel` is the highest level in the
+// party (see PLAN.md CalcInput).
 
 import { isRace, isClass } from "./enums.js";
 
@@ -23,8 +24,8 @@ const MAX_LEVEL = 60;
  * @typedef {Object} Party
  * @property {ReadonlyArray<PartyMember>} members  validated members, input order
  * @property {number}   size      number of members, 1-6
- * @property {number[]} levels    member levels in order (for the group-share term)
- * @property {number}   levelSum  sum of member levels
+ * @property {number[]} levels    member levels in order
+ * @property {number}   maxLevel  highest member level
  */
 
 /**
@@ -77,6 +78,6 @@ export function makeParty(combos) {
     members: Object.freeze(members),
     size: members.length,
     levels: Object.freeze(levels),
-    levelSum: levels.reduce((sum, l) => sum + l, 0),
+    maxLevel: Math.max(...levels),
   });
 }

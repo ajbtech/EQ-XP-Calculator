@@ -9,13 +9,13 @@ test("builds a single-member party", () => {
   const party = makeParty([member(RACES.HUMAN, CLASSES.WARRIOR, 10)]);
   assert.equal(party.size, 1);
   assert.deepEqual(party.levels, [10]);
-  assert.equal(party.levelSum, 10);
+  assert.equal(party.maxLevel, 10);
   assert.deepEqual(party.members, [
     { race: RACES.HUMAN, className: CLASSES.WARRIOR, level: 10 },
   ]);
 });
 
-test("builds a full six-member party with size, levels, and levelSum", () => {
+test("builds a full six-member party with size, levels, and maxLevel", () => {
   const party = makeParty([
     member(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 60),
     member(RACES.HUMAN, CLASSES.CLERIC, 55),
@@ -26,7 +26,16 @@ test("builds a full six-member party with size, levels, and levelSum", () => {
   ]);
   assert.equal(party.size, 6);
   assert.deepEqual(party.levels, [60, 55, 50, 45, 40, 35]);
-  assert.equal(party.levelSum, 285);
+  assert.equal(party.maxLevel, 60);
+});
+
+test("maxLevel is the highest level regardless of member position", () => {
+  const party = makeParty([
+    member(RACES.HUMAN, CLASSES.ROGUE, 14),
+    member(RACES.OGRE, CLASSES.WARRIOR, 51),
+    member(RACES.GNOME, CLASSES.MAGICIAN, 9),
+  ]);
+  assert.equal(party.maxLevel, 51);
 });
 
 test("preserves member order", () => {
