@@ -106,12 +106,9 @@ Confidence legend: ✅ confident (well-documented / community-given) ·
 ```
 function xpPerKill(input, tables):
 
-    # --- (A) base per-kill experience -------------------------------------
-    # ⚠️ The exact base formula and constant are UNVERIFIED. The widely cited
-    # EQEmu-derived form is:  base = mobLevel^2 * ZEM
-    # but the scaling constant and whether mobLevel is squared on P99 must be
-    # confirmed against the wiki Experience page + Project ZEM measurements.
-    base = (mobLevel ^ 2) * zem               # ⚠️ VERIFY exponent + constant
+    # --- (A) base per-kill experience -------------------------------------  ✅ confirmed
+    # The base per-kill formula is mobLevel^2 * ZEM (ZEM raw, 75 = normal).
+    base = (mobLevel ^ 2) * zem
 
     # --- (B) hell level multiplier ----------------------------------------  ✅ table given
     # 1.0 (1-29), 1.1 (30-34), 1.2 (35-39), 1.3 (40-44), 1.4 (45-50);
@@ -160,8 +157,8 @@ function xpForLevel(level):
 
 ## 5. Open questions (resolve before building)
 
-1. **Base per-kill XP formula + constant** — is it `mobLevel² × ZEM`, and what
-   is the scaling constant? (Blocking for any real number.)
+1. ~~**Base per-kill XP formula + constant**~~ — ✅ confirmed: `base = mobLevel² × ZEM`
+   (ZEM raw, 75 = normal). Implemented in `src/mobxp.js`.
 2. **Per-level XP totals** (`xpForLevel`) — what curve does P99 use? Needed for
    the 11% cap and kills-to-level. If unobtainable, fall back to expressing
    results as % of bar only.
