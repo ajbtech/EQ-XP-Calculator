@@ -25,14 +25,14 @@ import { awardXp } from "./award.js";
 
 /**
  * Kills needed per player to reach the next level against a given mob.
- * @param {Array<{level: number, xpSoFar: number, xpToNextLevel: number}>} characters 1-6
+ * @param {import("./party.js").Party} party a validated Party (see makeParty)
  * @param {number} mobLevel target mob level, integer >= 1
  * @param {number} zem zone experience modifier (raw, 75 = normal), > 0
  * @returns {KillsResult}
- * @throws {RangeError} on an invalid character list, mobLevel, or zem.
+ * @throws {RangeError} on an invalid party, mobLevel, or zem.
  */
-export function killsToNextLevel(characters, mobLevel, zem) {
-  const { total, awards } = awardXp(characters, mobLevel, zem);
+export function killsToNextLevel(party, mobLevel, zem) {
+  const { total, awards } = awardXp(party, mobLevel, zem);
 
   const players = awards.map((a) => {
     const remaining = a.character.xpToNextLevel - a.character.xpSoFar;

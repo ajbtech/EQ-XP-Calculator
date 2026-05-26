@@ -1,33 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  makeCharacter,
-  characterModifier,
-  xpForLevel,
-} from "../src/character.js";
+import { makeCharacter, characterModifier } from "../src/character.js";
 import { RACES, CLASSES } from "../src/enums.js";
 
 const close = (a, b) => Math.abs(a - b) < 1e-9;
-
-// --- xpForLevel -----------------------------------------------------------
-
-test("xpForLevel is level^3 * 1000 * modifier", () => {
-  assert.equal(xpForLevel(1, 1), 1000);
-  assert.equal(xpForLevel(2, 1), 8000);
-  assert.equal(xpForLevel(10, 1), 1_000_000);
-  assert.ok(close(xpForLevel(3, 1.68), 45360));
-});
-
-test("xpForLevel(0) is 0 (no levels completed)", () => {
-  assert.equal(xpForLevel(0, 1), 0);
-  assert.equal(xpForLevel(0, 1.68), 0);
-});
-
-test("xpForLevel rejects an out-of-range or non-integer level", () => {
-  assert.throws(() => xpForLevel(-1, 1), RangeError);
-  assert.throws(() => xpForLevel(61, 1), RangeError);
-  assert.throws(() => xpForLevel(1.5, 1), RangeError);
-});
 
 // --- characterModifier ----------------------------------------------------
 
@@ -141,6 +117,29 @@ test("xpSoFar is the cumulative XP to reach the current level", () => {
     penaltiesInEffect: true,
   });
   assert.ok(close(troll.xpSoFar, 1680)); // 1^3 * 1000 * 1.68
+});
+
+test("xpToNextLevel and xpSoFar are hell-level aware", () => {
+  // L50 (hellMod 1.4): xpToNextLevel = 50^3 * 1.4 * 1000 = 175,000,000;
+  // xpSoFar = totalXpToLevel(49) = 49^3 * 1.4 * 1000 = 164,708,600.
+  const lvl50 = makeCharacter({
+    race: RACES.HUMAN,
+    className: CLASSES.CLERIC,
+    level: 50,
+    penaltiesInEffect: true,
+  });
+  assert.equal(lvl50.xpToNextLevel, 50 ** 3 * 1.4 * 1000);
+  assert.equal(lvl50.xpSoFar, 49 ** 3 * 1.4 * 1000);
+
+  // L55 (hellMod 2.1); xpSoFar uses level 54 (hellMod 1.9).
+  const lvl55 = makeCharacter({
+    race: RACES.HUMAN,
+    className: CLASSES.CLERIC,
+    level: 55,
+    penaltiesInEffect: true,
+  });
+  assert.equal(lvl55.xpToNextLevel, 55 ** 3 * 2.1 * 1000);
+  assert.equal(lvl55.xpSoFar, 54 ** 3 * 1.9 * 1000);
 });
 
 test("the returned character is frozen", () => {

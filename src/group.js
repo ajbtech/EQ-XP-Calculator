@@ -9,6 +9,8 @@
 //   5 -> 1.14  (+14%)
 //   6 -> 1.20  (+20%)
 
+import { assertIntInRange } from "./validate.js";
+
 const BONUS = {
   1: 1.0,
   2: 1.02,
@@ -24,10 +26,6 @@ const BONUS = {
  * @returns {number} multiplier on XP gained
  */
 export function groupBonus(groupSize) {
-  if (!Number.isInteger(groupSize) || groupSize < 1 || groupSize > 6) {
-    throw new RangeError(
-      `groupSize must be an integer 1-6, got ${JSON.stringify(groupSize)}`,
-    );
-  }
+  assertIntInRange("groupSize", groupSize, 1, 6);
   return BONUS[groupSize];
 }
