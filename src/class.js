@@ -13,37 +13,41 @@
 //   -10% -> 1.1   Wizard, Magician, Enchanter, Necromancer
 //    +9% -> 0.91  Rogue
 //   +10% -> 0.90  Warrior
-// Any class not listed has no modifier (1.0).
+// Classes with no listed modifier (Cleric, Druid, Shaman) -> 1.0.
+//
+// Input must be a canonical class from src/enums.js (CLASSES.*). Anything that
+// is not a valid class throws, so callers can't pass an ambiguous string.
+
+import { CLASSES, isClass } from "./enums.js";
 
 const MODIFIERS = {
-  paladin: 1.4,
-  "shadow knight": 1.4,
-  ranger: 1.4,
-  bard: 1.4,
-  monk: 1.2,
-  wizard: 1.1,
-  magician: 1.1,
-  enchanter: 1.1,
-  necromancer: 1.1,
-  rogue: 0.91,
-  warrior: 0.9,
+  [CLASSES.PALADIN]: 1.4,
+  [CLASSES.SHADOW_KNIGHT]: 1.4,
+  [CLASSES.RANGER]: 1.4,
+  [CLASSES.BARD]: 1.4,
+  [CLASSES.MONK]: 1.2,
+  [CLASSES.WIZARD]: 1.1,
+  [CLASSES.MAGICIAN]: 1.1,
+  [CLASSES.ENCHANTER]: 1.1,
+  [CLASSES.NECROMANCER]: 1.1,
+  [CLASSES.ROGUE]: 0.91,
+  [CLASSES.WARRIOR]: 0.9,
 };
 
 /**
- * Classic-EQ class XP-to-level multiplier for a class name (case-insensitive).
- * @param {string} className
+ * Classic-EQ class XP-to-level multiplier for a canonical class.
+ * @param {string} className a value from CLASSES (src/enums.js)
  * @param {boolean} [penaltiesInEffect=true] when false, penalties (multipliers
  *   > 1) collapse to 1.0 while bonuses (multipliers < 1) still apply.
  * @returns {number} multiplier on XP required to level
  */
 export function classModifier(className, penaltiesInEffect = true) {
-  if (typeof className !== "string") {
-    throw new TypeError(`className must be a string, got ${typeof className}`);
+  if (!isClass(className)) {
+    throw new RangeError(
+      `className must be a CLASSES value, got ${JSON.stringify(className)}`,
+    );
   }
-  const key = className.trim().toLowerCase();
-  const modifier = Object.prototype.hasOwnProperty.call(MODIFIERS, key)
-    ? MODIFIERS[key]
-    : 1.0;
+  const modifier = MODIFIERS[className] ?? 1.0;
 
   if (!penaltiesInEffect && modifier > 1) {
     return 1.0;

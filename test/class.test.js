@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { classModifier } from "../src/class.js";
+import { CLASSES } from "../src/enums.js";
 
 // CLASSIC-EQ class XP modifier. P99 REMOVED class penalties (see CLAUDE.md/
 // PLAN.md) — this helper is reference/classic only.
@@ -12,69 +13,67 @@ import { classModifier } from "../src/class.js";
 //   -10% -> 1.1   Wizard, Magician, Enchanter, Necromancer
 //    +9% -> 0.91  Rogue
 //   +10% -> 0.90  Warrior
-// Any class not specified -> 1.0.
+//   Cleric/Druid/Shaman -> 1.0
 //
-// Second arg `penaltiesInEffect` (default true): when false, penalties (>1)
-// collapse to 1.0 but bonuses (<1) still apply.
+// Input must be a canonical CLASSES value; anything else throws.
 
 test("penalties in effect: hybrids -40% -> 1.4", () => {
-  assert.equal(classModifier("Paladin"), 1.4);
-  assert.equal(classModifier("Shadow Knight"), 1.4);
-  assert.equal(classModifier("Ranger"), 1.4);
-  assert.equal(classModifier("Bard"), 1.4);
+  assert.equal(classModifier(CLASSES.PALADIN), 1.4);
+  assert.equal(classModifier(CLASSES.SHADOW_KNIGHT), 1.4);
+  assert.equal(classModifier(CLASSES.RANGER), 1.4);
+  assert.equal(classModifier(CLASSES.BARD), 1.4);
 });
 
 test("penalties in effect: Monk -20% -> 1.2", () => {
-  assert.equal(classModifier("Monk"), 1.2);
+  assert.equal(classModifier(CLASSES.MONK), 1.2);
 });
 
 test("penalties in effect: int casters -10% -> 1.1", () => {
-  assert.equal(classModifier("Wizard"), 1.1);
-  assert.equal(classModifier("Magician"), 1.1);
-  assert.equal(classModifier("Enchanter"), 1.1);
-  assert.equal(classModifier("Necromancer"), 1.1);
+  assert.equal(classModifier(CLASSES.WIZARD), 1.1);
+  assert.equal(classModifier(CLASSES.MAGICIAN), 1.1);
+  assert.equal(classModifier(CLASSES.ENCHANTER), 1.1);
+  assert.equal(classModifier(CLASSES.NECROMANCER), 1.1);
 });
 
 test("bonuses: Rogue +9% -> 0.91, Warrior +10% -> 0.90", () => {
-  assert.equal(classModifier("Rogue"), 0.91);
-  assert.equal(classModifier("Warrior"), 0.9);
+  assert.equal(classModifier(CLASSES.ROGUE), 0.91);
+  assert.equal(classModifier(CLASSES.WARRIOR), 0.9);
 });
 
-test("any class not specified -> 1.0 (no throw)", () => {
-  assert.equal(classModifier("Cleric"), 1.0);
-  assert.equal(classModifier("Druid"), 1.0);
-  assert.equal(classModifier("Shaman"), 1.0);
-  assert.equal(classModifier("Bard the Brave"), 1.0);
-  assert.equal(classModifier(""), 1.0);
-});
-
-test("class name is case-insensitive and trimmed", () => {
-  assert.equal(classModifier("  warrior "), 0.9);
-  assert.equal(classModifier("SHADOW KNIGHT"), 1.4);
-  assert.equal(classModifier("necromancer"), 1.1);
+test("classes with no listed modifier -> 1.0", () => {
+  assert.equal(classModifier(CLASSES.CLERIC), 1.0);
+  assert.equal(classModifier(CLASSES.DRUID), 1.0);
+  assert.equal(classModifier(CLASSES.SHAMAN), 1.0);
 });
 
 test("penaltiesInEffect=false: penalties collapse to 1.0", () => {
-  assert.equal(classModifier("Paladin", false), 1.0);
-  assert.equal(classModifier("Monk", false), 1.0);
-  assert.equal(classModifier("Wizard", false), 1.0);
+  assert.equal(classModifier(CLASSES.PALADIN, false), 1.0);
+  assert.equal(classModifier(CLASSES.MONK, false), 1.0);
+  assert.equal(classModifier(CLASSES.WIZARD, false), 1.0);
 });
 
 test("penaltiesInEffect=false: bonuses still apply", () => {
-  assert.equal(classModifier("Rogue", false), 0.91);
-  assert.equal(classModifier("Warrior", false), 0.9);
+  assert.equal(classModifier(CLASSES.ROGUE, false), 0.91);
+  assert.equal(classModifier(CLASSES.WARRIOR, false), 0.9);
 });
 
-test("penaltiesInEffect=false: unspecified stays 1.0", () => {
-  assert.equal(classModifier("Cleric", false), 1.0);
+test("penaltiesInEffect=false: unmodified class stays 1.0", () => {
+  assert.equal(classModifier(CLASSES.CLERIC, false), 1.0);
 });
 
-test("penaltiesInEffect=true is the default and matches explicit true", () => {
-  assert.equal(classModifier("Paladin", true), 1.4);
-  assert.equal(classModifier("Paladin"), classModifier("Paladin", true));
+test("penaltiesInEffect=true is the default", () => {
+  assert.equal(classModifier(CLASSES.PALADIN, true), 1.4);
+  assert.equal(
+    classModifier(CLASSES.PALADIN),
+    classModifier(CLASSES.PALADIN, true),
+  );
 });
 
-test("throws for non-string input", () => {
+test("throws for non-canonical or invalid class input", () => {
+  assert.throws(() => classModifier("ShadowKnight")); // no space
+  assert.throws(() => classModifier("warrior")); // wrong case
+  assert.throws(() => classModifier("Bard the Brave"));
+  assert.throws(() => classModifier(""));
   assert.throws(() => classModifier(42));
   assert.throws(() => classModifier(null));
 });
