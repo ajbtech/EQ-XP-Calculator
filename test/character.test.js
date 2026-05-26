@@ -1,9 +1,33 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { makeCharacter, characterModifier } from "../src/character.js";
+import {
+  makeCharacter,
+  characterModifier,
+  xpForLevel,
+} from "../src/character.js";
 import { RACES, CLASSES } from "../src/enums.js";
 
 const close = (a, b) => Math.abs(a - b) < 1e-9;
+
+// --- xpForLevel -----------------------------------------------------------
+
+test("xpForLevel is level^3 * 1000 * modifier", () => {
+  assert.equal(xpForLevel(1, 1), 1000);
+  assert.equal(xpForLevel(2, 1), 8000);
+  assert.equal(xpForLevel(10, 1), 1_000_000);
+  assert.ok(close(xpForLevel(3, 1.68), 45360));
+});
+
+test("xpForLevel(0) is 0 (no levels completed)", () => {
+  assert.equal(xpForLevel(0, 1), 0);
+  assert.equal(xpForLevel(0, 1.68), 0);
+});
+
+test("xpForLevel rejects an out-of-range or non-integer level", () => {
+  assert.throws(() => xpForLevel(-1, 1), RangeError);
+  assert.throws(() => xpForLevel(61, 1), RangeError);
+  assert.throws(() => xpForLevel(1.5, 1), RangeError);
+});
 
 // --- characterModifier ----------------------------------------------------
 
@@ -92,15 +116,31 @@ test("the combined modifier is folded into xpToNextLevel", () => {
   assert.ok(close(troll.xpToNextLevel, 1680));
 });
 
-test("xpSoFar can be seeded and is stored as given", () => {
-  const c = makeCharacter({
+test("xpSoFar is the cumulative XP to reach the current level", () => {
+  // xpSoFar(L) === xpForLevel(L - 1): the XP to have completed the prior level.
+  const lvl2 = makeCharacter({
     race: RACES.HUMAN,
     className: CLASSES.CLERIC,
-    level: 5,
+    level: 2,
     penaltiesInEffect: true,
-    xpSoFar: 42000,
   });
-  assert.equal(c.xpSoFar, 42000);
+  assert.equal(lvl2.xpSoFar, 1000);
+
+  const lvl3 = makeCharacter({
+    race: RACES.HUMAN,
+    className: CLASSES.CLERIC,
+    level: 3,
+    penaltiesInEffect: true,
+  });
+  assert.equal(lvl3.xpSoFar, 8000);
+
+  const troll = makeCharacter({
+    race: RACES.TROLL,
+    className: CLASSES.SHADOW_KNIGHT,
+    level: 2,
+    penaltiesInEffect: true,
+  });
+  assert.ok(close(troll.xpSoFar, 1680)); // 1^3 * 1000 * 1.68
 });
 
 test("the returned character is frozen", () => {
@@ -123,21 +163,6 @@ test("throws on an out-of-range or non-integer level", () => {
   assert.throws(() => makeCharacter({ ...base, level: 61 }), RangeError);
   assert.throws(() => makeCharacter({ ...base, level: 10.5 }), RangeError);
   assert.throws(() => makeCharacter({ ...base, level: "10" }), RangeError);
-});
-
-test("throws on a negative or non-finite xpSoFar", () => {
-  const base = {
-    race: RACES.HUMAN,
-    className: CLASSES.CLERIC,
-    level: 5,
-    penaltiesInEffect: true,
-  };
-  assert.throws(() => makeCharacter({ ...base, xpSoFar: -1 }), RangeError);
-  assert.throws(
-    () => makeCharacter({ ...base, xpSoFar: Infinity }),
-    RangeError,
-  );
-  assert.throws(() => makeCharacter({ ...base, xpSoFar: "0" }), RangeError);
 });
 
 test("throws on invalid race, class, or missing flag", () => {
