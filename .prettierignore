@@ -1,0 +1,5 @@
+node_modules/
+package-lock.json
+
+# Docs are hand-formatted (ASCII wireframes, tables) — don't reflow them.
+*.md
