@@ -150,6 +150,12 @@ band with multiple green tiers scales the closest tiers (e.g. 0.5, 0.25) down to
 0 for the deepest green. This is why a too-low mob can be worthless to a group
 led by a high-level player.
 
+The full table below is generated from the engine
+(`scripts/generate-consider-table.js`); each row is tinted with its consider
+color, and light/dark green collapse to a single green.
+
+![Consider color, message, and XP modifier by character level and mob-level difference](consider-colors.svg)
+
 ### 9. Max level split (group level spread)
 
 In EverQuest, a group whose members span too wide a level range is penalized:
