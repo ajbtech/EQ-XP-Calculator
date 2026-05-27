@@ -589,7 +589,7 @@ function buildConstants() {
   refs.constants.conMod = kv("consider.mod").v;
   refs.constants.baseCon = kv("base_xp @ con").v;
   refs.constants.size = kv("group.size").v;
-  refs.constants.bonus = kv("group.bonus", "gain").v;
+  refs.constants.bonus = kv("group.bonus").v;
   refs.constants.party = kv("party_xp.kill", "gain").v;
   return el("div", { class: "block bordered" }, [
     el("div", { class: "block-title" }, "CONSTANTS"),
