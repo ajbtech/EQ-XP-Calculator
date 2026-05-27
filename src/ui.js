@@ -266,11 +266,11 @@ const COLS = [
   { id: "rc", label: "race", cls: "c-rc" },
   { id: "cl", label: "class", cls: "c-cl" },
   { id: "lv", label: "lvl", cls: "c-lv num" },
-  { id: "sh", label: "share", cls: "c-sh num" },
+  { id: "sh", label: "split", cls: "c-sh num" },
   { id: "gk", label: "+ / kill", cls: "c-gk num gain" },
   { id: "gp", label: "gain %", cls: "c-gp num soft" },
-  { id: "kl", label: "kills →", cls: "c-kl num accent" },
-  { id: "tm", label: "time →", cls: "c-tm num accent" },
+  { id: "kl", label: "kills → lvl", cls: "c-kl num accent" },
+  { id: "tm", label: "time → lvl", cls: "c-tm num accent" },
 ];
 
 function buildSheet() {

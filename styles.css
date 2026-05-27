@@ -167,8 +167,8 @@ a {
   display: grid;
   grid-template-columns:
     26px minmax(96px, 1fr) minmax(96px, 1fr)
-    52px 56px 76px 64px 60px 78px;
-  min-width: 604px;
+    52px 56px 76px 64px 86px 86px;
+  min-width: 638px;
 }
 .cell {
   padding: 6px 8px;
