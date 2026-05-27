@@ -185,7 +185,8 @@ function refresh() {
   const con = party ? consider(party.maxLevel, state.enc.mobLevel) : null;
   if (con) {
     const trivial = con.xpModifier === 0 ? " — trivial, no XP" : "";
-    refs.enc.con.textContent = con.text + trivial;
+    const pct = ` (${Math.round(con.xpModifier * 100)}%)`;
+    refs.enc.con.textContent = con.text + trivial + pct;
     refs.enc.con.className = "con-readout con-" + con.color.toLowerCase();
   } else {
     refs.enc.con.textContent = "";
