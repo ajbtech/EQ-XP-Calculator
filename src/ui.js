@@ -636,6 +636,11 @@ const EXPLAIN = [
     "ceil(levelXP ÷ perKill)",
     "Kills-to-level uses your slice after the group bonus, split, and cap. Time-to-level multiplies by your minutes-per-kill assumption.",
   ],
+  [
+    "Race / class modifiers",
+    null,
+    "Intended to balance the fact that some races and classes were more powerful than others. Class modifiers were turned off in the Velious timeline.",
+  ],
 ];
 
 function buildExplainer() {
