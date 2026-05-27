@@ -272,7 +272,7 @@ const COLS = [
   { id: "cl", label: "class", cls: "c-cl" },
   { id: "lv", label: "lvl", cls: "c-lv num" },
   { id: "sh", label: "split", cls: "c-sh num" },
-  { id: "gk", label: "+ / kill", cls: "c-gk num gain" },
+  { id: "gk", label: "XP / kill", cls: "c-gk num gain" },
   { id: "gp", label: "gain %", cls: "c-gp num soft" },
   { id: "kl", label: "kills → lvl", cls: "c-kl num accent" },
   { id: "tm", label: "time → lvl", cls: "c-tm num accent" },
@@ -340,7 +340,7 @@ function buildSheet() {
       refresh();
     });
 
-    const sh = el("span");
+    const sh = el("span", { class: "soft" });
     const gk = el("span", { class: "gain" });
     const gp = el("span", { class: "soft" });
     const kl = el("span", { class: "accent" });
