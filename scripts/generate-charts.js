@@ -2,14 +2,15 @@
 // Pure data comes from the engine in src/ — no XP/kill math is duplicated here;
 // this file only does SVG layout. Run with: node scripts/generate-charts.js
 //
-// Charts (all bar charts, level 1-60, bars tinted by hell-level band):
+// Charts (all bar charts, level 1-60). Bars are tinted by hell-level kind: a
+// "hell level" is one where hellMod CHANGES from the level below; the size of
+// that change names it (+0.1 hell, +0.2 double hell, +0.3 triple hell).
 //   1. xp-per-level.svg       cumulative XP to achieve each level
 //   2. xp-to-next-level.svg   XP required to advance to the next level
 //   3. kills-to-next-level.svg solo kills vs a same-level (white-con) mob
 //
-// Charts 2 and 3 spike at the 51-60 hell boundaries: hellMod scales the whole
-// cumulative in level.js, so the per-level increment jumps where the multiplier
-// steps up (most visibly at level 59).
+// Charts 2 and 3 jump at hell levels (where the multiplier steps up); the
+// biggest jump is the level-59 triple hell level.
 
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -22,8 +23,17 @@ const MAX_LEVEL = 60;
 // Baseline "normal" ZEM and a no-modifier solo Human Cleric for the kills chart.
 const BASELINE_ZEM = 75;
 
-const bandColor = (hell) =>
-  hell >= 1.5 ? "#b3261e" : hell > 1.0 ? "#e8833a" : "#1f6feb";
+// Hell-level kind, by how much hellMod changes at this level, in tenths:
+//   0 = not a hell level, 1 = hell (+0.1), 2 = double (+0.2), 3 = triple (+0.3).
+const HELL_COLORS = ["#1f6feb", "#f4b740", "#e8833a", "#b3261e"];
+const HELL_LABELS = [
+  "no change",
+  "hell level (+0.1)",
+  "double hell (+0.2)",
+  "triple hell (+0.3)",
+];
+const hellStep = (level) =>
+  level === 1 ? 0 : Math.round((hellMod(level) - hellMod(level - 1)) * 10);
 
 function niceTick(maxY) {
   const raw = maxY / 6;
@@ -57,16 +67,16 @@ function barChart({ title, subtitle, yLabel, data, fmtY }) {
     const bx = m.left + d.level * slot - slot + (slot - barW) / 2;
     const by = y(d.value);
     const bh = m.top + ph - by;
-    bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" fill="${bandColor(d.hell)}"/>`;
+    bars += `<rect x="${bx.toFixed(1)}" y="${by.toFixed(1)}" width="${barW.toFixed(1)}" height="${bh.toFixed(1)}" fill="${HELL_COLORS[d.step]}"/>`;
     if (d.level % 5 === 0 || d.level === 1) {
       grid += `<text x="${(bx + barW / 2).toFixed(1)}" y="${m.top + ph + 20}" text-anchor="middle" font-size="12" fill="#555">${d.level}</text>`;
     }
   }
 
-  const legend = `
-<rect x="${m.left}" y="${H - 30}" width="11" height="11" fill="#1f6feb"/><text x="${m.left + 16}" y="${H - 20}" font-size="11" fill="#555">no hell mod (1-29)</text>
-<rect x="${m.left + 150}" y="${H - 30}" width="11" height="11" fill="#e8833a"/><text x="${m.left + 166}" y="${H - 20}" font-size="11" fill="#555">hell 1.1-1.4 (30-50)</text>
-<rect x="${m.left + 320}" y="${H - 30}" width="11" height="11" fill="#b3261e"/><text x="${m.left + 336}" y="${H - 20}" font-size="11" fill="#555">hell 1.5-3.1 (51-60)</text>`;
+  const legend = HELL_COLORS.map((c, i) => {
+    const x = m.left + i * 160;
+    return `<rect x="${x}" y="${H - 30}" width="11" height="11" fill="${c}"/><text x="${x + 16}" y="${H - 20}" font-size="11" fill="#555">${HELL_LABELS[i]}</text>`;
+  }).join("\n");
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="system-ui,Arial,sans-serif">
 <rect width="${W}" height="${H}" fill="#ffffff"/>
@@ -93,9 +103,9 @@ const cumulative = [];
 const perLevel = [];
 const kills = [];
 for (let level = 1; level <= MAX_LEVEL; level++) {
-  const hell = hellMod(level);
-  cumulative.push({ level, hell, value: totalXpToLevel(level, 1) });
-  perLevel.push({ level, hell, value: xpToReachLevel(level, 1) });
+  const step = hellStep(level);
+  cumulative.push({ level, step, value: totalXpToLevel(level, 1) });
+  perLevel.push({ level, step, value: xpToReachLevel(level, 1) });
   // Solo, no race/class modifier, vs a same-level mob (white con), baseline ZEM.
   const party = makeParty(
     [{ race: "Human", className: "Cleric", level }],
@@ -103,7 +113,7 @@ for (let level = 1; level <= MAX_LEVEL; level++) {
   );
   kills.push({
     level,
-    hell,
+    step,
     value: killsToNextLevel(party, level, BASELINE_ZEM).players[0].kills,
   });
 }
