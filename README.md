@@ -1,5 +1,7 @@
 # EQ-XP-Calculator
-This app helps you understand how many mobs you need to defeat per level and accounts for XP in groups.
+
+This app helps you understand how many mobs you need to defeat per level and
+accounts for XP in groups.
 
 ## How experience works in Project 1999
 
@@ -8,7 +10,7 @@ single number. This section explains each piece the calculator models. Many of
 the constants — especially ZEMs and the per-level curve — are **community
 estimates, not published values**, so treat results as approximate.
 
-### 1. XP per level
+## 1. XP per level
 
 The cumulative XP to reach a level follows a cubic curve:
 
@@ -30,7 +32,7 @@ xpToReachLevel(L) = totalXpToLevel(L) - totalXpToLevel(L - 1)
 The exact per-level totals are not wiki-verified, so the cubic is the adopted
 community-style estimate.
 
-### 2. Race / class modifiers
+## 2. Race / class modifiers
 
 These are XP-**to-level** multipliers: a penalty (`> 1`) means you need *more*
 XP to level; a bonus (`< 1`) means *less*. Per the wiki, race and class
@@ -54,7 +56,7 @@ classic-EQ values (Paladin/SK/Ranger/Bard 1.4, Monk 1.2, Wizard/Mage/Enchanter/
 Necromancer 1.1, Rogue 0.91, Warrior 0.90) are retained for reference/comparison
 only and are not applied unless penalties are explicitly toggled on.
 
-### 3. XP per mob
+## 3. XP per mob
 
 The base XP a single mob is worth, before group, con, or cap adjustments:
 
@@ -62,14 +64,14 @@ The base XP a single mob is worth, before group, con, or cap adjustments:
 mobXp = mobLevel^2 * ZEM
 ```
 
-### 4. ZEM (Zone Experience Modifier)
+## 4. ZEM (Zone Experience Modifier)
 
 `ZEM` is a per-zone multiplier where **75 = "normal"**. P99 ZEMs are **custom
 and unpublished** — the standard ShowEQ/EQEmu values are wrong for P99 — so the
 calculator uses community best-guess values from the wiki and labels them as
 estimates.
 
-### 5. Hell levels
+## 5. Hell levels
 
 "Hell levels" cost progressively more XP. `H` is a multiplier (`>= 1.0`) applied
 to the XP **requirement** (item 1), not to per-kill gain:
@@ -87,7 +89,7 @@ to the XP **requirement** (item 1), not to per-kill gain:
 
 (Note: the table jumps 1.7 → 1.9 between 53 and 54.)
 
-### 6. Number of mobs needed per level
+## 6. Number of mobs needed per level
 
 Kills needed is the remaining XP divided by XP gained per kill, rounded up:
 
@@ -100,7 +102,7 @@ kills = ceil((xpToNextLevel - xpSoFar) / xpPerKill)
 level. Excess XP above the cap is simply lost, not redistributed. A mob that
 cons deep green awards 0 XP, so it can never level you (kills → infinite).
 
-### 7. Group split
+## 7. Group split
 
 Grouping has two parts. First, a **group-size bonus** multiplies the party's
 total XP for a kill:
@@ -119,7 +121,7 @@ member's cumulative XP so far** (`xpSoFar`) — higher-level members take a larg
 share. A level-1 member (0 cumulative XP) is floored to a baseline weight so it
 still receives a share rather than 0%.
 
-### 8. Con range based on the highest character
+## 8. Con range based on the highest character
 
 A mob's "consider" color (and its XP modifier) is computed against the
 **highest-level member of the group**, not each individual. Blue/White/Yellow/
@@ -128,7 +130,7 @@ band with multiple green tiers scales the closest tiers (e.g. 0.5, 0.25) down to
 0 for the deepest green. This is why a too-low mob can be worthless to a group
 led by a high-level player.
 
-### 9. Max level split (group level spread)
+## 9. Max level split (group level spread)
 
 In EverQuest, a group whose members span too wide a level range is penalized:
 members far below the top level can fall "out of range" and receive reduced or
