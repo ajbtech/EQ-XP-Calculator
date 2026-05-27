@@ -171,8 +171,8 @@ function refresh() {
 
   // Consider readout (highest-level member vs mob) — actual con message, in
   // the matching EverQuest con color.
-  if (party) {
-    const con = consider(party.maxLevel, state.enc.mobLevel);
+  const con = party ? consider(party.maxLevel, state.enc.mobLevel) : null;
+  if (con) {
     const trivial = con.xpModifier === 0 ? " — trivial, no XP" : "";
     refs.enc.con.textContent = con.text + trivial;
     refs.enc.con.className = "con-readout con-" + con.color.toLowerCase();
@@ -190,14 +190,19 @@ function refresh() {
     ? `${activeN} active → ×${groupBonus(Math.min(activeN, 6)).toFixed(2)} multiplier`
     : "no active members";
 
-  // Constants — base XP at the normal ZEM (75) and adjusted for the selected ZEM.
+  // Constants — base XP at the normal ZEM (75), the selected ZEM, then after
+  // the consider modifier.
   refs.constants.baseNorm.textContent = fmtNum(
     mobXp(state.enc.mobLevel, zems.baseline),
   );
-  refs.constants.baseZem.textContent = zemOk
-    ? fmtNum(mobXp(state.enc.mobLevel, zem))
+  const baseZem = zemOk ? mobXp(state.enc.mobLevel, zem) : NaN;
+  refs.constants.baseZem.textContent = zemOk ? fmtNum(baseZem) : "—";
+  refs.constants.baseZemKey.textContent = `base_xp @ ${zemOk ? zem : "?"} ZEM`;
+  refs.constants.baseCon.textContent =
+    zemOk && con ? fmtNum(baseZem * con.xpModifier) : "—";
+  refs.constants.conMod.textContent = con
+    ? "×" + con.xpModifier.toFixed(2)
     : "—";
-  refs.constants.baseZemKey.textContent = `base_xp @ ${zemOk ? zem : "?"}`;
   refs.constants.size.textContent = String(activeN);
   refs.constants.bonus.textContent = activeN
     ? "×" + groupBonus(Math.min(activeN, 6)).toFixed(2)
@@ -577,10 +582,12 @@ function buildConstants() {
     body.appendChild(el("div", { class: "kv" }, [kEl, v]));
     return { kEl, v };
   };
-  refs.constants.baseNorm = kv("base_xp @ 75").v;
-  const baseZemRow = kv("base_xp @ zem");
+  refs.constants.baseNorm = kv("base_xp @ 75 ZEM").v;
+  const baseZemRow = kv("base_xp @ zem ZEM");
   refs.constants.baseZem = baseZemRow.v;
   refs.constants.baseZemKey = baseZemRow.kEl;
+  refs.constants.baseCon = kv("base_xp @ con").v;
+  refs.constants.conMod = kv("consider.mod").v;
   refs.constants.size = kv("group.size").v;
   refs.constants.bonus = kv("group.bonus", "gain").v;
   refs.constants.party = kv("party_xp.kill", "gain").v;
