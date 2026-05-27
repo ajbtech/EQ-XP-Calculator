@@ -2,7 +2,9 @@
 This app helps you understand how many mobs you need to defeat per level and accounts for XP in groups.
 
 ## Disclaimer
-Over the course of its life, Everquest has changed modifiers, hell levels, ZEM and xp to level. There are also several places where hard sources of truth do not exist, so assumptions must be made. As a result, any calculator will be wrong. This calculator optimizes for the Project 1999 server, but should generally be applicable to TLPs during the classic era. Treat all results as approximate. Feel free to provide feedback and corrections to Gorrek at ajbtechinfo@gmail.com
+Over the course of its life, Everquest has changed modifiers, hell levels, ZEM and xp to level. There are also several places where hard sources of truth do not exist, so assumptions must be made. As a result, any calculator can be at best an approximation and can't be correct for all eras. 
+
+This calculator optimizes for the Project 1999 server, but should generally be applicable to TLPs during the classic era. Treat all results as approximate. Feel free to provide feedback and corrections to Gorrek at ajbtechinfo@gmail.com
 
 ## How experience works in Project 1999
 
