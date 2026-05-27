@@ -309,10 +309,31 @@ A group whose members span too wide a level range is penalized:
 members far below the top level can fall "out of range" and receive reduced or
 no XP. *
 
-### 7. Group split
+This is the second way that lower level playesr can receive no experience when 
+in a group. It is dependent only on the highest character level and each 
+individual player level.
 
-Grouping has two parts. First, a **group-size bonus** multiplies the party's
-total XP for a kill:
+If the level difference within a group is too great the lower level member will not get experience. The criterion is:
+
+Lowest Level * 1.5 (Round down) or Highest Level * 0.667 (Round up) and always at least 5 levels.
+
+*Generic Examples*
+
+- Level 1 can group with up to a 6
+- Level 20 can group up to a 30 (20 * 1.5 = 30)
+- Level 30 can group down to a 20 (30 * 0.667 = 20)
+
+*Rounding Examples*
+
+- Level 33 can group up to a 49 (33 * 1.5 = 49.5)
+- Level 50 can group down to a 34 (50 * 0.67 = 33.34)
+
+### 7. Group Bonus
+
+To incentivize group, a **group-size bonus** multiplies the party's
+total XP for a kill. This was modified over the timeline, but the calcualtor
+reflects the currently implemented bonus on P99 which was implemented during the
+late Velious era.
 
 | Size | Bonus |
 |---|---|
@@ -323,14 +344,14 @@ total XP for a kill:
 | 5 | 1.14 (+14%) |
 | 6 | 1.20 (+20%) |
 
+
+
+### 10. Group Split
+
 Second, that party total is **split between members in proportion to each
 member's cumulative XP so far** (`xpSoFar`) — higher-level members take a larger
 share. A level-1 member (0 cumulative XP) is floored to a baseline weight so it
 still receives a share rather than 0%.
-
-
-
-
 
 ## References
 
