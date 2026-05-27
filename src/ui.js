@@ -37,7 +37,7 @@ const state = {
   ],
   enc: {
     mobLevel: 44,
-    minutesPerKill: 0.8,
+    minutesPerKill: 6,
     zoneName: "Lower Guk",
     useManualZem: false,
     manualZem: 75,
