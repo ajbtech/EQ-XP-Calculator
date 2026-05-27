@@ -127,11 +127,13 @@ function refresh() {
     const share = shares[k].share * 100;
     r.sh.textContent = share.toFixed(0) + "%";
 
-    r.gk.textContent =
-      "+" + fmtNum(player.xpPerKill) + (player.capApplied ? " *" : "");
-    r.gk.title = player.capApplied
-      ? "11% per-mob cap applied — excess XP is lost"
-      : "";
+    r.gk.textContent = "+" + fmtNum(player.xpPerKill);
+    if (player.capApplied) {
+      r.gk.appendChild(el("span", { class: "cap-flag" }, " *"));
+      r.gk.title = "11% per-mob cap applied — excess XP is lost";
+    } else {
+      r.gk.title = "";
+    }
 
     r.gp.textContent =
       player.remaining > 0
@@ -148,9 +150,7 @@ function refresh() {
 
   // Totals row.
   const activeN = activeIdx.length;
-  const sumLvl = activeIdx.reduce((s, i) => s + state.party[i].level, 0);
   refs.totals.nm.textContent = `Σ active ${activeN}/6`;
-  refs.totals.lv.textContent = activeN ? `Σ ${sumLvl}` : "";
   refs.totals.sh.textContent = result ? "100%" : "—";
   refs.totals.gk.textContent = result ? "+" + fmtNum(result.total) : "—";
 
@@ -162,13 +162,16 @@ function refresh() {
     : "unknown zone";
   refs.enc.zoneZem.textContent = `(${zemForZone(zems, state.enc.zoneName) ?? "?"})`;
 
-  // Consider readout (highest-level member vs mob).
+  // Consider readout (highest-level member vs mob) — actual con message, in
+  // the matching EverQuest con color.
   if (party) {
     const con = consider(party.maxLevel, state.enc.mobLevel);
     const trivial = con.xpModifier === 0 ? " — trivial, no XP" : "";
-    refs.enc.con.textContent = `con vs lvl ${party.maxLevel}: ${con.color}${trivial}`;
+    refs.enc.con.textContent = con.text + trivial;
+    refs.enc.con.className = "con-readout con-" + con.color.toLowerCase();
   } else {
     refs.enc.con.textContent = "";
+    refs.enc.con.className = "con-readout";
   }
 
   // Group bonus cells.
@@ -180,9 +183,14 @@ function refresh() {
     ? `${activeN} active → ×${groupBonus(Math.min(activeN, 6)).toFixed(2)} multiplier`
     : "no active members";
 
-  // Constants.
-  const base = zemOk ? mobXp(state.enc.mobLevel, zem) : NaN;
-  refs.constants.base.textContent = fmtNum(base);
+  // Constants — base XP at the normal ZEM (75) and adjusted for the selected ZEM.
+  refs.constants.baseNorm.textContent = fmtNum(
+    mobXp(state.enc.mobLevel, zems.baseline),
+  );
+  refs.constants.baseZem.textContent = zemOk
+    ? fmtNum(mobXp(state.enc.mobLevel, zem))
+    : "—";
+  refs.constants.baseZemKey.textContent = `base_xp @ ${zemOk ? zem : "?"}`;
   refs.constants.size.textContent = String(activeN);
   refs.constants.bonus.textContent = activeN
     ? "×" + groupBonus(Math.min(activeN, 6)).toFixed(2)
@@ -307,7 +315,6 @@ function buildSheet() {
   const totalCols = COLS.map((col) => {
     const cell = el("div", { class: `cell ${col.cls} totals-cell` });
     if (col.id === "rc") refs.totals.nm = cell;
-    if (col.id === "lv") refs.totals.lv = cell;
     if (col.id === "sh") refs.totals.sh = cell;
     if (col.id === "gk") refs.totals.gk = cell;
     return cell;
@@ -399,7 +406,7 @@ function buildEncounter() {
     state.enc.zoneName = zoneSel.value;
     refresh();
   });
-  card.appendChild(field("In the zone of", zoneSel));
+  card.appendChild(field("Zone", zoneSel));
 
   // ZEM control.
   const zemBlock = el("div", { class: "divider" });
@@ -457,23 +464,17 @@ function buildEncounter() {
   zemBlock.appendChild(modes);
   card.appendChild(zemBlock);
 
-  // Penalties toggle.
-  const penLabel = () =>
-    state.enc.penaltiesOn ? "as classic" : "normalized (P99)";
-  const stateLabel = el("span", {}, penLabel());
+  // Penalties toggle — label left, checkbox pinned to the right.
   const penCb = checkbox(
     () => state.enc.penaltiesOn,
     (v) => {
       state.enc.penaltiesOn = v;
     },
-    () => {
-      stateLabel.textContent = penLabel();
-      refresh();
-    },
+    refresh,
   );
   const toggle = el("div", { class: "toggle-row" }, [
     el("span", { class: "enc-label" }, "class XP penalties"),
-    el("div", { class: "toggle-state" }, [penCb, stateLabel]),
+    penCb,
   ]);
   card.appendChild(toggle);
 
@@ -526,16 +527,18 @@ function buildGroupBonus() {
 function buildConstants() {
   const body = el("div", { class: "block-body" });
   const kv = (k, valueClass) => {
+    const kEl = el("span", { class: "k" }, k);
     const v = el("span", { class: "v " + (valueClass || "") });
-    body.appendChild(
-      el("div", { class: "kv" }, [el("span", { class: "k" }, k), v]),
-    );
-    return v;
+    body.appendChild(el("div", { class: "kv" }, [kEl, v]));
+    return { kEl, v };
   };
-  refs.constants.base = kv("base_xp.kill");
-  refs.constants.size = kv("group.size");
-  refs.constants.bonus = kv("group.bonus", "gain");
-  refs.constants.party = kv("party_xp.kill", "gain");
+  refs.constants.baseNorm = kv("base_xp @ 75").v;
+  const baseZemRow = kv("base_xp @ zem");
+  refs.constants.baseZem = baseZemRow.v;
+  refs.constants.baseZemKey = baseZemRow.kEl;
+  refs.constants.size = kv("group.size").v;
+  refs.constants.bonus = kv("group.bonus", "gain").v;
+  refs.constants.party = kv("party_xp.kill", "gain").v;
   return el("div", { class: "block bordered" }, [
     el("div", { class: "block-title" }, "CONSTANTS"),
     body,
@@ -596,19 +599,15 @@ function buildExplainer() {
       ]),
     );
   }
-  const howDetails = el("details", {}, [
+  const howDetails = el("details", { open: "" }, [
     summary("How experience works on P99"),
     grid,
   ]);
 
   const readmeBody = el("div", { class: "readme" }, "Loading…");
   let readmeLoaded = false;
-  const readmeDetails = el("details", {}, [
-    summary("Project README"),
-    readmeBody,
-  ]);
-  readmeDetails.addEventListener("toggle", async () => {
-    if (!readmeDetails.open || readmeLoaded) return;
+  async function loadReadme() {
+    if (readmeLoaded) return;
     readmeLoaded = true;
     try {
       const res = await fetch("./README.md");
@@ -618,7 +617,15 @@ function buildExplainer() {
       readmeBody.innerHTML =
         '<p>Could not load the README. See <a href="https://github.com/ajbtech/EQ-XP-Calculator#readme">it on GitHub</a>.</p>';
     }
+  }
+  const readmeDetails = el("details", { open: "" }, [
+    summary("Project README"),
+    readmeBody,
+  ]);
+  readmeDetails.addEventListener("toggle", () => {
+    if (readmeDetails.open) loadReadme();
   });
+  loadReadme();
 
   return el("div", { class: "explainer" }, [howDetails, readmeDetails]);
 }
@@ -637,13 +644,12 @@ function build() {
 
   app.appendChild(
     el("header", { class: "app-header" }, [
-      el("span", { class: "app-title" }, "P99 XP Calculator"),
+      el("span", { class: "app-title" }, "EQ XP Calculator"),
       el(
         "span",
         { class: "app-tagline" },
         "party + encounter, kills and time to level",
       ),
-      el("span", { class: "app-tag" }, "Project 1999"),
     ]),
   );
 

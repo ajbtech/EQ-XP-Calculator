@@ -22,12 +22,25 @@
   --accent: oklch(0.78 0.13 30);
   --accent-soft: oklch(0.66 0.1 30);
   --gain: oklch(0.78 0.14 165);
+  --danger: oklch(0.68 0.19 25);
   --warn-bg: oklch(0.4 0.09 75 / 0.18);
   --warn-rule: oklch(0.62 0.1 75);
+
+  /* EverQuest "consider" colors (used only for the con readout). */
+  --con-green: oklch(0.8 0.18 145);
+  --con-blue: oklch(0.72 0.13 250);
+  --con-white: oklch(0.95 0.005 250);
+  --con-yellow: oklch(0.85 0.15 95);
+  --con-red: oklch(0.68 0.2 25);
 
   --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Three text sizes only. */
+  --fs-lg: 22px;
+  --fs-md: 13px;
+  --fs-sm: 10px;
 
   color-scheme: dark;
 }
@@ -46,7 +59,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
-  font-size: 14px;
+  font-size: var(--fs-md);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -72,24 +85,14 @@ a {
 }
 .app-title {
   font-family: var(--font-display);
-  font-size: 30px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   letter-spacing: -0.5px;
   line-height: 1;
 }
 .app-tagline {
   color: var(--text-soft);
-  font-size: 14px;
-}
-.app-tag {
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--accent);
-  padding: 3px 8px;
-  border: 1px solid var(--accent);
+  font-size: var(--fs-md);
 }
 
 /* ── Honesty banner ───────────────────────────────────── */
@@ -99,7 +102,7 @@ a {
   background: var(--warn-bg);
   border: 1px solid var(--warn-rule);
   border-left-width: 3px;
-  font-size: 12.5px;
+  font-size: var(--fs-md);
   color: var(--text-soft);
 }
 .banner strong {
@@ -138,18 +141,18 @@ a {
 .section-head h2 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: var(--fs-lg);
   font-weight: 600;
   letter-spacing: -0.3px;
 }
 .section-head .hint {
   color: var(--text-faint);
-  font-size: 13px;
+  font-size: var(--fs-md);
   font-weight: 400;
 }
 .section-head .meta {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--fs-sm);
   letter-spacing: 0.6px;
   color: var(--text-faint);
 }
@@ -190,7 +193,7 @@ a {
   border-bottom: 1.4px solid var(--text);
   border-right-color: var(--rule);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--fs-sm);
   letter-spacing: 0.8px;
   text-transform: uppercase;
   font-weight: 600;
@@ -205,22 +208,27 @@ a {
   border-bottom: none;
   border-right-color: var(--rule);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--fs-md);
   font-weight: 600;
+  color: var(--text-soft);
+}
+.cell.row-totals.gain {
+  color: var(--gain);
 }
 
 .cell .gain {
   color: var(--gain);
 }
 .cell .accent {
-  color: var(--accent);
+  color: var(--text-soft);
   font-weight: 500;
 }
 .cell .soft {
   color: var(--text-soft);
 }
 .cap-flag {
-  color: var(--accent);
+  color: var(--danger);
+  font-weight: 600;
   cursor: help;
 }
 
@@ -229,7 +237,7 @@ a {
 .cell select {
   font: inherit;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--text);
   background: transparent;
   border: none;
@@ -271,7 +279,7 @@ a {
 .sheet-note {
   margin-top: 12px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-sm);
   color: var(--text-faint);
 }
 
@@ -316,13 +324,13 @@ a {
 }
 .card-title {
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: var(--fs-lg);
   font-weight: 700;
   line-height: 1;
 }
 .card-sub {
   color: var(--text-faint);
-  font-size: 12px;
+  font-size: var(--fs-md);
   margin-bottom: 14px;
 }
 
@@ -335,13 +343,13 @@ a {
 }
 .enc-label {
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: var(--fs-md);
   color: var(--text-soft);
 }
 .big-input {
   font: inherit;
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: var(--fs-lg);
   color: var(--text);
   background: transparent;
   border: none;
@@ -353,7 +361,7 @@ a {
 .enc-field select {
   font: inherit;
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: var(--fs-md);
   color: var(--text);
   background: transparent;
   border: none;
@@ -369,9 +377,25 @@ a {
 }
 
 .con-readout {
-  font-size: 12px;
+  font-size: var(--fs-md);
   color: var(--text-soft);
   margin: -4px 0 12px;
+  font-weight: 500;
+}
+.con-readout.con-green {
+  color: var(--con-green);
+}
+.con-readout.con-blue {
+  color: var(--con-blue);
+}
+.con-readout.con-white {
+  color: var(--con-white);
+}
+.con-readout.con-yellow {
+  color: var(--con-yellow);
+}
+.con-readout.con-red {
+  color: var(--con-red);
 }
 
 .divider {
@@ -387,13 +411,13 @@ a {
 }
 .zem-value {
   font-family: var(--font-mono);
-  font-size: 22px;
-  color: var(--accent);
+  font-size: var(--fs-lg);
+  color: var(--text-soft);
   font-weight: 600;
 }
 .zem-rel {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-sm);
   color: var(--text-faint);
   margin-bottom: 8px;
 }
@@ -408,7 +432,7 @@ a {
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--fs-md);
   color: var(--text-soft);
 }
 .radio .dot {
@@ -436,7 +460,7 @@ a {
 .zem-custom {
   font: inherit;
   font-family: var(--font-mono);
-  font-size: 18px;
+  font-size: var(--fs-md);
   color: var(--text);
   background: transparent;
   border: none;
@@ -454,14 +478,6 @@ a {
   padding-top: 10px;
   border-top: 1px dashed var(--rule);
 }
-.toggle-state {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-soft);
-  font-size: 13px;
-}
-
 /* ── Group bonus + constants ──────────────────────────── */
 .panel {
   border: 1.2px solid var(--rule);
@@ -470,7 +486,7 @@ a {
 }
 .panel-title {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: var(--fs-lg);
   margin-bottom: 8px;
 }
 .bonus-cells {
@@ -486,7 +502,7 @@ a {
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-sm);
   color: var(--text-faint);
 }
 .bonus-cell.on {
@@ -495,13 +511,13 @@ a {
   color: var(--accent);
 }
 .bonus-note {
-  font-size: 12px;
+  font-size: var(--fs-md);
   color: var(--text-soft);
 }
 
 .block-title {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: var(--fs-sm);
   letter-spacing: 1px;
   font-weight: 600;
   padding: 5px 10px;
@@ -527,12 +543,13 @@ a {
 }
 .kv .k {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-sm);
   color: var(--text-soft);
 }
 .kv .v {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--fs-md);
+  color: var(--text-soft);
 }
 .kv .v.gain {
   color: var(--gain);
@@ -554,7 +571,7 @@ a {
   align-items: center;
   justify-content: space-between;
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: var(--fs-lg);
   font-weight: 600;
 }
 .explainer summary::-webkit-details-marker {
@@ -562,7 +579,7 @@ a {
 }
 .explainer summary .toggle {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-sm);
   color: var(--text-soft);
 }
 .explain-grid {
@@ -573,17 +590,17 @@ a {
 }
 .explain-block .eb-title {
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: var(--fs-md);
   margin-bottom: 2px;
 }
 .explain-block .eb-formula {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-sm);
   color: var(--accent);
   margin-bottom: 6px;
 }
 .explain-block .eb-body {
-  font-size: 13px;
+  font-size: var(--fs-md);
   line-height: 1.45;
   color: var(--text-soft);
 }
@@ -602,7 +619,7 @@ a {
 }
 .readme code {
   font-family: var(--font-mono);
-  font-size: 0.9em;
+  font-size: var(--fs-sm);
   background: var(--card-bg);
   padding: 0.1em 0.3em;
   border-radius: 3px;
