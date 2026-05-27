@@ -52,6 +52,16 @@ export function zemForZone(zems, zone) {
 }
 
 /**
+ * The lowest and highest ZEM across every zone in the snapshot.
+ * @param {ZemSnapshot} zems
+ * @returns {{min: number, max: number}}
+ */
+export function zemRange(zems) {
+  const values = flattenZones(zems).map((z) => z.zem);
+  return { min: Math.min(...values), max: Math.max(...values) };
+}
+
+/**
  * Fetch and parse the ZEM snapshot. The fetch implementation is injectable so
  * the loader is testable without a browser.
  * @param {typeof fetch} [fetchImpl] defaults to the global fetch

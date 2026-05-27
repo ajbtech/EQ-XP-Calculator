@@ -14,7 +14,7 @@ import {
   CLASS_VALUES,
 } from "./xp.js";
 import { fmtNum, fmtMins } from "./format.js";
-import { loadZems, continentGroups, zemForZone } from "./data.js";
+import { loadZems, continentGroups, zemForZone, zemRange } from "./data.js";
 import { renderMarkdown } from "./markdown.js";
 
 const MAX_LEVEL = 60;
@@ -597,6 +597,9 @@ function buildConstants() {
   ]);
 }
 
+// Placeholder swapped for "Varies from <min> to <max>" once ZEM data loads.
+const ZEM_RANGE_FORMULA = Symbol("zem-range");
+
 const EXPLAIN = [
   [
     "Base mob XP",
@@ -605,7 +608,7 @@ const EXPLAIN = [
   ],
   [
     "Zone modifier (ZEM)",
-    "community est.",
+    ZEM_RANGE_FORMULA,
     "P99 ZEMs are custom and unpublished. These are community best-guesses from the wiki — not official numbers. Treat them as approximate.",
   ],
   [
@@ -614,14 +617,9 @@ const EXPLAIN = [
     "Larger groups earn a bonus: 3 = +6%, 6 = +20%. XP splits across members by accumulated XP; inactive members don't share or count toward size.",
   ],
   [
-    "No class XP penalty",
-    "P99 removed it",
-    "P99 dropped the old class XP penalties; race bonuses/penalties still apply. Flip the toggle to “as classic” to model the pre-P99 class penalties.",
-  ],
-  [
     "XP to next level",
-    "lvl³ × race × hell × 1000",
-    "Each level costs roughly the cube of its number. Hell levels (51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
+    "lvl³ × race × class × hell × 1000",
+    "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
   ],
   [
     "11% per-mob cap",
@@ -629,24 +627,25 @@ const EXPLAIN = [
     "Since 2013 a single kill grants at most 11% of your current level's XP; any excess is lost. Capped per-kill values are marked with *.",
   ],
   [
-    "Kills & time to level",
-    "ceil(levelXP ÷ perKill)",
-    "Kills-to-level uses your slice after the group bonus, split, and cap. Time-to-level multiplies by your minutes-per-kill assumption.",
-  ],
-  [
-    "Caveats",
+    "Race / class modifiers",
     null,
-    "Numbers approximate classic/Kunark-era P99. AA, Lesson, raid mobs, named multipliers, and exact ZEMs are not modeled.",
+    "Intended to balance the fact that some races and classes were more powerful than others. Class modifiers were turned off in the Velious timeline.",
   ],
 ];
 
 function buildExplainer() {
   const grid = el("div", { class: "explain-grid" });
+  const { min, max } = zemRange(zems);
+  const zemLow = Math.min(min, zems.baseline);
   for (const [title, formula, bodyText] of EXPLAIN) {
+    const formulaText =
+      formula === ZEM_RANGE_FORMULA
+        ? `Varies from ${zemLow} to ${max}`
+        : formula;
     grid.appendChild(
       el("div", { class: "explain-block" }, [
         el("div", { class: "eb-title" }, title),
-        formula ? el("div", { class: "eb-formula" }, formula) : null,
+        formulaText ? el("div", { class: "eb-formula" }, formulaText) : null,
         el("div", { class: "eb-body" }, bodyText),
       ]),
     );
