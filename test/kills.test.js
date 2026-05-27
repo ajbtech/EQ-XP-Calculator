@@ -30,13 +30,13 @@ test("a smaller per-kill share means more kills", () => {
 
 test("kills track each player's own remaining XP and share", () => {
   // L2 (remaining 7000) + L3 (remaining 19000), mob L3, zem 75.
-  // total = 3^2 * 75 * 1.02 = 688.5; shares 1/9 and 8/9.
-  // L2: xp 76.5 -> ceil(7000/76.5) = 92.  L3: xp 612 -> ceil(19000/612) = 32.
+  // total = 3^2 * 75 * 1.02 = 688.5; weights 8000/27000 -> shares 8/35 and 27/35.
+  // L2: xp 157.37 -> ceil(7000/157.37) = 45.  L3: xp 531.13 -> ceil(19000/531.13) = 36.
   const result = killsToNextLevel(party(m(2), m(3)), 3, 75);
   assert.equal(result.players[0].remaining, 7000);
-  assert.equal(result.players[0].kills, 92);
+  assert.equal(result.players[0].kills, 45);
   assert.equal(result.players[1].remaining, 19000);
-  assert.equal(result.players[1].kills, 32);
+  assert.equal(result.players[1].kills, 36);
 });
 
 test("the 11% per-mob cap increases the kills needed", () => {

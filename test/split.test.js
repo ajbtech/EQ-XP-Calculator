@@ -15,7 +15,7 @@ test("a single character gets the whole share", () => {
   assert.equal(result[0].share, 1);
 });
 
-test("equal xpSoFar splits evenly", () => {
+test("equal level splits evenly", () => {
   const result = splitXp(
     party(m(RACES.HUMAN, CLASSES.CLERIC, 5), m(RACES.HUMAN, CLASSES.CLERIC, 5)),
   );
@@ -23,47 +23,49 @@ test("equal xpSoFar splits evenly", () => {
   assert.ok(close(result[1].share, 0.5));
 });
 
-test("share is proportional to xpSoFar", () => {
-  // L2 Cleric xpSoFar = 1000, L3 Cleric xpSoFar = 8000, total 9000.
+test("share is proportional to xpToNextLevel (L)", () => {
+  // L2 Cleric weight = 2^3*1000 = 8000, L3 Cleric = 3^3*1000 = 27000,
+  // total 35000.
   const result = splitXp(
     party(m(RACES.HUMAN, CLASSES.CLERIC, 2), m(RACES.HUMAN, CLASSES.CLERIC, 3)),
   );
-  assert.ok(close(result[0].share, 1000 / 9000));
-  assert.ok(close(result[1].share, 8000 / 9000));
+  assert.ok(close(result[0].share, 8000 / 35000));
+  assert.ok(close(result[1].share, 27000 / 35000));
 });
 
 test("the combined modifier flows through the share", () => {
-  // L2 Troll SK xpSoFar = 1680, L2 Human Cleric xpSoFar = 1000, total 2680.
+  // L2 Troll SK weight = 8000*1.68 = 13440, L2 Human Cleric = 8000,
+  // total 21440.
   const result = splitXp(
     party(
       m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 2),
       m(RACES.HUMAN, CLASSES.CLERIC, 2),
     ),
   );
-  assert.ok(close(result[0].share, 1680 / 2680));
-  assert.ok(close(result[1].share, 1000 / 2680));
+  assert.ok(close(result[0].share, 13440 / 21440));
+  assert.ok(close(result[1].share, 8000 / 21440));
 });
 
-test("a level-1 character is weighted as 1000, not 0", () => {
-  // L1 weight 1000, L3 Cleric xpSoFar 8000, total 9000 -> L1 still gets a share.
+test("a level-1 character uses the normal L weight, not 0", () => {
+  // L1 Cleric weight = 1^3*1000 = 1000, L3 Cleric = 27000, total 28000.
   const result = splitXp(
     party(m(RACES.HUMAN, CLASSES.CLERIC, 1), m(RACES.HUMAN, CLASSES.CLERIC, 3)),
   );
-  assert.ok(close(result[0].share, 1000 / 9000));
+  assert.ok(close(result[0].share, 1000 / 28000));
   assert.ok(result[0].share > 0);
-  assert.ok(close(result[1].share, 8000 / 9000));
+  assert.ok(close(result[1].share, 27000 / 28000));
 });
 
-test("the level-1 weight is a flat 1000, ignoring the modifier", () => {
-  // Both level 1, so both weighted 1000 despite the Troll SK's 1.68 modifier.
+test("the modifier flows through even at level 1", () => {
+  // L1 Troll SK weight = 1000*1.68 = 1680, L1 Human Cleric = 1000, total 2680.
   const result = splitXp(
     party(
       m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 1),
       m(RACES.HUMAN, CLASSES.CLERIC, 1),
     ),
   );
-  assert.ok(close(result[0].share, 0.5));
-  assert.ok(close(result[1].share, 0.5));
+  assert.ok(close(result[0].share, 1680 / 2680));
+  assert.ok(close(result[1].share, 1000 / 2680));
 });
 
 test("shares always sum to 1", () => {
