@@ -94,6 +94,17 @@ a {
   color: var(--text-soft);
   font-size: var(--fs-md);
 }
+.app-tag {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 3px 8px;
+  border: 1px solid var(--accent);
+}
 
 /* ── Honesty banner ───────────────────────────────────── */
 .banner {

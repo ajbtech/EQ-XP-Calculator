@@ -702,6 +702,16 @@ function build() {
         { class: "app-tagline" },
         "party + encounter, kills and time to level",
       ),
+      el(
+        "a",
+        {
+          class: "app-tag",
+          href: "https://github.com/ajbtech/EQ-XP-Calculator",
+          target: "_blank",
+          rel: "noopener",
+        },
+        "ajbtech",
+      ),
     ]),
   );
 
@@ -713,13 +723,7 @@ function build() {
   );
 
   const left = el("div", { class: "pane-left" }, [
-    el("div", { class: "section-head" }, [
-      el("div", {}, [
-        el("h2", {}, "Party"),
-        el("span", { class: "hint" }, " — up to 6, edit in place"),
-      ]),
-      el("span", { class: "meta" }, "race · class · level"),
-    ]),
+    el("div", { class: "section-head" }, [el("h2", {}, "Party")]),
     buildSheet(),
     el(
       "div",
