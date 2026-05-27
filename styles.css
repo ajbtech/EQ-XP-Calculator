@@ -120,6 +120,9 @@ a {
   padding: 18px 24px;
   min-width: 0;
 }
+.pane-left .panel {
+  margin-top: 18px;
+}
 .pane-right {
   padding: 18px 22px;
   background: var(--panel-bg);
