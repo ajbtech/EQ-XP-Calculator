@@ -21,48 +21,12 @@ const MAX_LEVEL = 60;
 
 const state = {
   party: [
-    {
-      name: "Norrath",
-      race: "Barbarian",
-      className: "Warrior",
-      level: 42,
-      active: true,
-    },
-    {
-      name: "Selindra",
-      race: "High Elf",
-      className: "Cleric",
-      level: 41,
-      active: true,
-    },
-    {
-      name: "Vexis",
-      race: "Dark Elf",
-      className: "Necromancer",
-      level: 43,
-      active: true,
-    },
-    {
-      name: "Doru",
-      race: "Ogre",
-      className: "Shaman",
-      level: 40,
-      active: true,
-    },
-    {
-      name: "Tarvi",
-      race: "Wood Elf",
-      className: "Ranger",
-      level: 41,
-      active: true,
-    },
-    {
-      name: "Plink",
-      race: "Gnome",
-      className: "Enchanter",
-      level: 42,
-      active: false,
-    },
+    { race: "Barbarian", className: "Warrior", level: 42, active: true },
+    { race: "High Elf", className: "Cleric", level: 41, active: true },
+    { race: "Dark Elf", className: "Necromancer", level: 43, active: true },
+    { race: "Ogre", className: "Shaman", level: 40, active: true },
+    { race: "Wood Elf", className: "Ranger", level: 41, active: true },
+    { race: "Gnome", className: "Enchanter", level: 42, active: false },
   ],
   enc: {
     mobLevel: 44,
@@ -263,7 +227,6 @@ function selectEl(values, current, onChange, className) {
 
 const COLS = [
   { id: "act", label: "", cls: "c-act" },
-  { id: "nm", label: "name", cls: "c-nm" },
   { id: "rc", label: "race", cls: "c-rc" },
   { id: "cl", label: "class", cls: "c-cl" },
   { id: "lv", label: "lvl", cls: "c-lv num" },
@@ -295,15 +258,6 @@ function buildSheet() {
       },
       refresh,
     );
-
-    const name = el("input", {
-      type: "text",
-      value: c.name,
-      "aria-label": "name",
-    });
-    name.addEventListener("input", () => {
-      c.name = name.value;
-    });
 
     const race = selectEl(RACE_VALUES, c.race, (v) => {
       c.race = v;
@@ -339,7 +293,7 @@ function buildSheet() {
     cells.kl = kl;
     cells.tm = tm;
 
-    const contents = [cb, name, race, klass, level, sh, gk, gp, kl, tm];
+    const contents = [cb, race, klass, level, sh, gk, gp, kl, tm];
     const rowCells = COLS.map((col, j) =>
       el("div", { class: `cell ${col.cls}` }, contents[j]),
     );
@@ -352,7 +306,7 @@ function buildSheet() {
   // Totals row.
   const totalCols = COLS.map((col) => {
     const cell = el("div", { class: `cell ${col.cls} totals-cell` });
-    if (col.id === "nm") refs.totals.nm = cell;
+    if (col.id === "rc") refs.totals.nm = cell;
     if (col.id === "lv") refs.totals.lv = cell;
     if (col.id === "sh") refs.totals.sh = cell;
     if (col.id === "gk") refs.totals.gk = cell;
