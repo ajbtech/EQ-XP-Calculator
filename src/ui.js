@@ -619,7 +619,7 @@ const EXPLAIN = [
   [
     "Group split",
     "share by level",
-    "The party's XP splits across active members by their cumulative XP to next level. With class penalties off, the split is purely level-based (race/class modifiers removed); with them on, penalized combos take a larger share. Inactive members don't share.",
+    "The party's XP splits across active members by their cumulative XP to next level. With class penalties off, the split is purely level-based (race/class modifiers removed); with them on, penalized combos take a larger share.",
   ],
   [
     "XP to next level",
