@@ -157,7 +157,7 @@ function refresh() {
 
   // Totals row.
   const activeN = activeIdx.length;
-  refs.totals.nm.textContent = `Σ party ${activeN}/6`;
+  refs.totals.nm.textContent = `party ${activeN}/6`;
   refs.totals.sh.textContent = result ? "100%" : "—";
   refs.totals.gk.textContent = result ? "+" + fmtNum(result.total) : "—";
 
