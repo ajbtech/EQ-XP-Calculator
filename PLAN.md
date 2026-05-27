@@ -56,19 +56,24 @@ EQ-XP-Calculator/
   README.md               # user-facing; live-site link + uncertainty note
   PLAN.md                 # this document
   src/
-    xp.js                 # PURE formula module (no DOM) — the contract
-    ui.js                 # reads the form, calls xp.js, renders results
-    data.js               # loads + validates JSON from data/
+    xp.js          # PUBLIC API barrel (no DOM) — the contract; re-exports below
+    validate.js    # shared RangeError guards (assertIntInRange, ...)
+    enums.js       # RACES / CLASSES + isRace/isClass
+    race.js class.js hell.js group.js consider.js mob.js   # primitives (pure tables)
+    level.js       # totalXpToLevel / xpToReachLevel  (HELL-AWARE: applies hellMod)
+    character.js   # characterModifier + makeCharacter  (Character entity)
+    party.js       # makeParty(combos, penaltiesInEffect) -> Party {characters,size,maxLevel}
+    partyxp.js     # partyXpForMob(party, mobLevel, zem)  (party total for one mob)
+    split.js award.js kills.js   # share split / per-char award (11% cap) / kills
+    ui.js          # (pending) DOM layer; reads form, calls xp.js, renders
+    data.js        # (pending) loads + validates JSON from data/
   data/
-    zems.json             # community ZEM table: zone -> {zem, recLevels, notes}
-    races.json            # race -> xp modifier
-    hellmod.json          # level-range -> hell_mod
-    groups.json           # party-size -> group bonus; share-formula constants
-    meta.json             # source URLs, lastVerified date, disclaimer text
-  test/
-    xp.test.js            # node:test golden-value tests for src/xp.js
+    zems.json      # community ZEM table (zone -> ZEM). Race/class/hell/group
+                   # modifiers live in code (race/class/hell/group .js), not JSON.
+  test/            # one *.test.js per src module (node:test golden values)
   .github/workflows/
-    test.yml              # node --test on push/PR
+    test.yml       # lint + format:check + node --test on push/PR
+    deploy.yml     # publish repo root to GitHub Pages on main
 ```
 
 ## 3. Data model
@@ -103,50 +108,35 @@ EQ-XP-Calculator/
 Confidence legend: ✅ confident (well-documented / community-given) ·
 ⚠️ **MUST VERIFY** against the wiki before shipping.
 
+As implemented (party pipeline, hell-aware end-to-end). Race penalties/bonuses
+and hell levels live on the XP **requirement** (`level.js`); the per-kill GAIN
+path (`partyxp.js`) does NOT re-apply them, so there is no double counting.
+
 ```
-function xpPerKill(input, tables):
+# --- XP requirement (level.js) ---------------------------------------  ✅
+totalXpToLevel(level, modifier) = level^3 * modifier * hellMod(level) * 1000
+  # modifier = characterModifier(race, className, penaltiesInEffect)        (character.js)
+  #          = raceModifier(race) * classModifier(className, penaltiesInEffect)
+  # HELL LEVELS LIVE HERE (hell.js), not on per-kill gain.  class penalties
+  # collapse to 1.0 when penaltiesInEffect is false (P99).
+makeCharacter: xpSoFar = totalXpToLevel(level-1),  xpToNextLevel = totalXpToLevel(level)
 
-    # --- (A) base per-kill experience -------------------------------------  ✅ confirmed
-    # The base per-kill formula is mobLevel^2 * ZEM (ZEM raw, 75 = normal).
-    base = (mobLevel ^ 2) * zem
+# --- per-kill party gain (partyxp.js) --------------------------------
+base    = mobLevel^2 * zem                       # mob.js   ✅ confirmed (ZEM raw, 75 = normal)
+grouped = base * groupBonus(size)                # group.js ✅ 1.0/1.02/1.06/1.10/1.14/1.20
+total   = grouped * consider(maxLevel, mobLevel).xpModifier   # consider.js ✅ (0 for deep green)
 
-    # --- (B) hell level multiplier ----------------------------------------  ✅ table given
-    # 1.0 (1-29), 1.1 (30-34), 1.2 (35-39), 1.3 (40-44), 1.4 (45-50);
-    # increases further in Kunark levels.  ⚠️ exact 51-60 values UNVERIFIED.
-    base = base * hellMod(playerLevel)
+# --- per-character share (split.js) ----------------------------------
+share_i ∝ xpSoFar_i  (a level-1 member is floored to weight 1000); shares sum to 1
+  # Replaces the old (playerLevel+5)/(Σ groupLevels + size*5) group-share formula.
 
-    # --- (C) group bonus multiplier ---------------------------------------  ✅ values given
-    # size 1..6 -> 1.0 / 1.2 / 1.4 / 1.6 / 1.8 / 2.16
-    grouped = base * groupBonus(groupSize)
+# --- per-character award + 11% cap (award.js) ------------------------  ✅ rule since 2013-07
+xp_i = min(total * share_i, 0.11 * (xpToNextLevel_i - xpSoFar_i))
+  # cap = 11% of the current level's bar (xpToReachLevel). Excess is lost.
 
-    # --- (D) group share ---------------------------------------------------  ✅ formula given
-    share = grouped * (playerLevel + 5) / (sum(groupLevels) + groupSize * 5)
-    # ⚠️ ORDER of (C) vs (D) — whether the group bonus multiplies the pre- or
-    # post-share value — is an assumption; verify against wiki worked examples.
-
-    # --- (E) race modifier -------------------------------------------------  ✅ still active on P99
-    # Class penalties are GONE; race bonus/penalty remains (e.g. Halfling bonus,
-    # Troll/Ogre penalty).  ⚠️ exact per-race percentages UNVERIFIED.
-    raced = share * raceModifier(race)
-
-    # --- (F) 11% per-mob cap -----------------------------------------------  ✅ rule given (since 2013-07)
-    # A single kill cannot grant more than 11% of the xp needed for the
-    # player's CURRENT level.
-    cap = 0.11 * xpForLevel(playerLevel)      # ⚠️ depends on the curve below
-    final = min(raced, cap)
-    capApplied = (raced > cap)
-
-    return { final, capApplied }
-
-
-function xpForLevel(level):
-    # ⚠️ ENTIRELY UNVERIFIED. Needed to (a) apply the 11% cap and (b) convert
-    # xpPerKill into "kills to next level". Classic EQ uses a cubic-ish curve
-    # (~ level^3 with per-class modifiers), but P99's exact per-level totals
-    # MUST be sourced from the wiki Experience page. Until verified, the UI
-    # should present results as ESTIMATES and may express "kills to level" as a
-    # fraction of the bar rather than absolute xp.
-    ...
+# --- kills to level (kills.js) ---------------------------------------
+kills_i = ceil((xpToNextLevel_i - xpSoFar_i) / xp_i)   # Infinity if xp_i == 0
+  # "remaining" is hell-aware via totalXpToLevel.
 ```
 
 **Sources to verify the formula against:**
@@ -158,11 +148,15 @@ function xpForLevel(level):
 ## 5. Open questions (resolve before building)
 
 1. ~~**Base per-kill XP formula + constant**~~ — ✅ confirmed: `base = mobLevel² × ZEM`
-   (ZEM raw, 75 = normal). Implemented in `src/mobxp.js`.
-2. **Per-level XP totals** (`xpForLevel`) — what curve does P99 use? Needed for
-   the 11% cap and kills-to-level. If unobtainable, fall back to expressing
-   results as % of bar only.
-3. **Group-bonus vs group-share order of operations** — which multiplies which?
+   (ZEM raw, 75 = normal). Implemented in `src/mob.js` / `src/partyxp.js`.
+2. **Per-level XP totals** — implemented in `src/level.js` as
+   `level³ × modifier × hellMod(level) × 1000` (the adopted community-style
+   cubic). ⚠️ The exact per-level totals are still not wiki-verified, so present
+   results as estimates.
+3. ~~**Group-bonus vs group-share order**~~ — resolved: the share is
+   `xpSoFar`-weighted (`src/split.js`), replacing the old
+   `(playerLevel+5)/(Σ levels + size×5)` formula. Group bonus is applied to the
+   party total before the split.
 4. **Con color** — model light-blue/dark-blue/white/yellow explicitly, or trust
    the level delta? (Proposal: trust the level delta in v1; show con color as a
    derived display label only.)
@@ -171,7 +165,8 @@ function xpForLevel(level):
    confidence (Project ZEM *measured* vs *guessed*)?
 6. **Race modifier exact percentages** — confirm per-race numbers and that no
    class component leaks in.
-7. **Level cap** — is it 60 (Kunark) for v1? Confirm `hell_mod` for 51-60.
+7. **Level cap** — 60 (Kunark) for v1. `hell_mod` for 51-60 is implemented as a
+   per-level table in `src/hell.js` (51→1.5 … 60→3.1).
 8. **XP bar granularity** — can players read 0–100% reliably, or should the
    input be coarse (e.g. 10% steps)?
 

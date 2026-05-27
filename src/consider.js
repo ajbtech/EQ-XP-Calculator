@@ -17,6 +17,8 @@
 // Note: L22-25's wiki text reads "-7 and -7", which leaves delta -8 uncovered.
 // Per project decision this is read as "-7 and -8".
 
+import { assertIntInRange } from "./validate.js";
+
 const ge = (lo) => (d) => d >= lo; // d >= lo
 const le = (hi) => (d) => d <= hi; // d <= hi
 const between = (lo, hi) => (d) => d >= lo && d <= hi;
@@ -522,10 +524,6 @@ const GREEN_MODIFIERS = {
   3: [0.5, 0.25, 0],
 };
 
-function isInt(n) {
-  return Number.isInteger(n);
-}
-
 /**
  * Resolve the P99 consider color, message, and xp modifier for a kill.
  * @param {number} charLevel player level, 1-60
@@ -533,12 +531,8 @@ function isInt(n) {
  * @returns {{ color: string, text: string, xpModifier: number }}
  */
 export function consider(charLevel, mobLevel) {
-  if (!isInt(charLevel) || charLevel < 1 || charLevel > 60) {
-    throw new RangeError(`charLevel must be an integer 1-60, got ${charLevel}`);
-  }
-  if (!isInt(mobLevel) || mobLevel < 1) {
-    throw new RangeError(`mobLevel must be an integer >= 1, got ${mobLevel}`);
-  }
+  assertIntInRange("charLevel", charLevel, 1, 60);
+  assertIntInRange("mobLevel", mobLevel, 1);
 
   const band = BANDS.find((b) => charLevel >= b.min && charLevel <= b.max);
   const delta = mobLevel - charLevel;

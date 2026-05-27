@@ -12,6 +12,8 @@
 //
 // Input must be an integer level 1-60 (v1 Kunark cap); anything else throws.
 
+import { assertIntInRange } from "./validate.js";
+
 const PER_LEVEL = {
   51: 1.5,
   52: 1.6,
@@ -31,11 +33,7 @@ const PER_LEVEL = {
  * @returns {number} multiplier on XP required to complete the level
  */
 export function hellMod(level) {
-  if (!Number.isInteger(level) || level < 1 || level > 60) {
-    throw new RangeError(
-      `level must be an integer 1-60, got ${JSON.stringify(level)}`,
-    );
-  }
+  assertIntInRange("level", level, 1, 60);
   if (level <= 29) return 1.0;
   if (level <= 34) return 1.1;
   if (level <= 39) return 1.2;

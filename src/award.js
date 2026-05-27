@@ -2,16 +2,14 @@
 //
 // Wires the per-kill total (partyXpForMob) together with the per-character
 // split (splitXp): compute the party's total XP for a mob, then hand each
-// character its proportional slice. The party's size and highest level — what
-// partyXpForMob needs — are derived from the characters themselves, so the
-// caller passes a single list of characters.
+// character its proportional slice.
 //
 // Each character's slice is then clamped by the 11% per-mob cap (P99, since
 // 2013-07): a single kill cannot grant more than 11% of the XP needed for that
 // character's current level, i.e. 0.11 * (xpToNextLevel - xpSoFar). Capped XP
 // is not redistributed — the excess is simply lost.
 
-import { partyXpForMob } from "./mobxp.js";
+import { partyXpForMob } from "./partyxp.js";
 import { splitXp } from "./split.js";
 
 // A single kill grants at most this fraction of a character's current level.
@@ -33,18 +31,15 @@ const PER_MOB_CAP = 0.11;
 
 /**
  * XP each character receives for killing one mob.
- * @param {Array<{level: number, xpSoFar: number}>} characters 1-6 characters
+ * @param {import("./party.js").Party} party a validated Party (see makeParty)
  * @param {number} mobLevel target mob level, integer >= 1
  * @param {number} zem zone experience modifier (raw, 75 = normal), > 0
  * @returns {AwardResult}
- * @throws {RangeError} on an invalid character list, mobLevel, or zem.
+ * @throws {RangeError} on an invalid party, mobLevel, or zem.
  */
-export function awardXp(characters, mobLevel, zem) {
-  const allocations = splitXp(characters);
-
-  const size = characters.length;
-  const maxLevel = Math.max(...characters.map((c) => c.level));
-  const total = partyXpForMob({ size, maxLevel }, mobLevel, zem);
+export function awardXp(party, mobLevel, zem) {
+  const total = partyXpForMob(party, mobLevel, zem);
+  const allocations = splitXp(party);
 
   return Object.freeze({
     total,
