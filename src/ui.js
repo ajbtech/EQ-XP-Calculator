@@ -617,11 +617,6 @@ const EXPLAIN = [
     "Larger groups earn a bonus: 3 = +6%, 6 = +20%. XP splits across members by accumulated XP; inactive members don't share or count toward size.",
   ],
   [
-    "No class XP penalty",
-    "P99 removed it",
-    "P99 dropped the old class XP penalties; race bonuses/penalties still apply. Flip the toggle to “as classic” to model the pre-P99 class penalties.",
-  ],
-  [
     "XP to next level",
     "lvl³ × race × class × hell × 1000",
     "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
@@ -630,11 +625,6 @@ const EXPLAIN = [
     "11% per-mob cap",
     "min(slice, 11% of bar)",
     "Since 2013 a single kill grants at most 11% of your current level's XP; any excess is lost. Capped per-kill values are marked with *.",
-  ],
-  [
-    "Kills & time to level",
-    "ceil(levelXP ÷ perKill)",
-    "Kills-to-level uses your slice after the group bonus, split, and cap. Time-to-level multiplies by your minutes-per-kill assumption.",
   ],
   [
     "Race / class modifiers",
