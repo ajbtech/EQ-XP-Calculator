@@ -1,5 +1,7 @@
 # EQ-XP-Calculator
-This app helps you understand how many mobs you need to defeat per level and accounts for XP in groups.
+
+This app helps you understand how many mobs you need to defeat per level and
+accounts for XP in groups.
 
 ## Disclaimer
 Over the course of its life, Everquest has changed modifiers, hell levels, ZEM and xp to level. There are also several places where hard sources of truth do not exist, so assumptions must be made. As a result, any calculator can be at best an approximation and can't be correct for all eras. 
@@ -13,7 +15,7 @@ single number. This section explains each piece the calculator models. Many of
 the constants — especially ZEMs and the per-level curve — are **community
 estimates, not published values**, so treat results as approximate.
 
-### 1. XP per level
+## 1. XP per level
 
 The cumulative XP to reach a level follows a cubic curve:
 
@@ -36,7 +38,7 @@ xpToReachLevel(L) = totalXpToLevel(L) - totalXpToLevel(L - 1)
 
 ![XP required to reach the next level, levels 1–60, modifier 1.0](xp-to-next-level.svg)
 
-### 2. Race / class modifiers
+## 2. Race / class modifiers
 
 These are XP-**to-level** multipliers: a penalty (`> 1`) means you need *more*
 XP to level; a bonus (`< 1`) means *less*. Race and class
@@ -76,6 +78,7 @@ The calculator allows the user to select whether or not class penalties are in
 effect. Notably this selection also changes the method of how XP is split
 within a group which took place in the same patch (see below).
 
+## 3. XP per mob
 ### 3. Hell levels
 
 "Hell levels" cost progressively more XP. `H` is a multiplier (`>= 1.0`) applied
@@ -157,6 +160,7 @@ The base XP a single mob is worth, before group, con, or cap adjustments:
 baseMobXp = mobLevel^2 * ZEM
 ```
 
+## 4. ZEM (Zone Experience Modifier)
 ### 5. ZEM (Zone Experience Modifier)
 
 `ZEM` is a per-zone multiplier where **75 = "normal"**. ZEM values have changed
@@ -164,6 +168,7 @@ over time and most published sources should be considered unrelaible. This calcu
 uses the ZEM based on the P99 wiki, but individual ZEM values can be entered as well
 if a good source of truth is known.
 
+## 5. Hell levels
 ZEM values were intended to help balance the danger of various zones (typically
 dungeons).
 
@@ -175,6 +180,7 @@ much more incrementally than is commonly understood.
 
 ![Kills to reach the next level against a same-level white-con mob, solo, ZEM 75](kills-to-next-level.svg)
 
+## 6. Number of mobs needed per level
 ### 7. Max XP
 
 The Max XP from a single mob has also changed over the course of the EQ timeline.
@@ -330,6 +336,7 @@ Lowest Level * 1.5 (Round down) or Highest Level * 0.667 (Round up) and always a
 - Level 33 can group up to a 49 (33 * 1.5 = 49.5)
 - Level 50 can group down to a 34 (50 * 0.67 = 33.34)
 
+## 7. Group split
 ### 7. Group Bonus
 
 To incentivize group, a **group-size bonus** multiplies the party's
@@ -347,6 +354,7 @@ late Velious era.
 | 6 | 1.20 (+20%) |
 
 
+## 8. Con range based on the highest character
 
 ### 10. Group Split
 There are two different methods to split XP, depending on whether or not class 
@@ -384,7 +392,7 @@ color, and light/dark green collapse to a single green.
 
 ![Consider color, message, and XP modifier by character level and mob-level difference](consider-colors.svg)
 
-### 9. Max level split (group level spread)
+## 9. Max level split (group level spread)
 
 In EverQuest, a group whose members span too wide a level range is penalized:
 members far below the top level can fall "out of range" and receive reduced or
