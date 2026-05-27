@@ -45,8 +45,8 @@ function niceTick(maxY) {
 
 function barChart({ title, subtitle, yLabel, data, fmtY }) {
   const W = 980;
-  const H = 560;
-  const m = { top: 64, right: 30, bottom: 60, left: 110 };
+  const H = 580;
+  const m = { top: 64, right: 30, bottom: 96, left: 110 };
   const pw = W - m.left - m.right;
   const ph = H - m.top - m.bottom;
   const slot = pw / MAX_LEVEL;
@@ -75,7 +75,7 @@ function barChart({ title, subtitle, yLabel, data, fmtY }) {
 
   const legend = HELL_COLORS.map((c, i) => {
     const x = m.left + i * 160;
-    return `<rect x="${x}" y="${H - 30}" width="11" height="11" fill="${c}"/><text x="${x + 16}" y="${H - 20}" font-size="11" fill="#555">${HELL_LABELS[i]}</text>`;
+    return `<rect x="${x}" y="${m.top + ph + 56}" width="11" height="11" fill="${c}"/><text x="${x + 16}" y="${m.top + ph + 65}" font-size="11" fill="#555">${HELL_LABELS[i]}</text>`;
   }).join("\n");
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="system-ui,Arial,sans-serif">
@@ -86,7 +86,7 @@ ${grid}
 ${bars}
 <line x1="${m.left}" y1="${m.top}" x2="${m.left}" y2="${m.top + ph}" stroke="#888"/>
 <line x1="${m.left}" y1="${m.top + ph}" x2="${m.left + pw}" y2="${m.top + ph}" stroke="#888"/>
-<text x="${m.left + pw / 2}" y="${H - 44}" text-anchor="middle" font-size="13" fill="#333">Level</text>
+<text x="${m.left + pw / 2}" y="${m.top + ph + 40}" text-anchor="middle" font-size="13" fill="#333">Level</text>
 <text x="22" y="${m.top + ph / 2}" text-anchor="middle" font-size="13" fill="#333" transform="rotate(-90 22 ${m.top + ph / 2})">${yLabel}</text>
 ${legend}
 </svg>
