@@ -220,7 +220,7 @@ a {
   color: var(--gain);
 }
 .cell .accent {
-  color: var(--text-soft);
+  color: var(--danger);
   font-weight: 500;
 }
 .cell .soft {
