@@ -281,6 +281,26 @@ a {
   display: block;
 }
 
+.row-clear {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  font-size: var(--fs-md);
+  line-height: 1;
+  cursor: pointer;
+}
+.row-clear:hover,
+.row-clear:focus-visible {
+  color: var(--danger);
+  outline: none;
+}
+
 .sheet-note {
   margin-top: 12px;
   font-family: var(--font-mono);
