@@ -641,9 +641,10 @@ const EXPLAIN = [
 function buildExplainer() {
   const grid = el("div", { class: "explain-grid" });
   const { min, max } = zemRange(zems);
+  const zemLow = Math.min(min, zems.baseline);
   for (const [title, formula, bodyText] of EXPLAIN) {
     const formulaText =
-      formula === ZEM_RANGE_FORMULA ? `Varies from ${min} to ${max}` : formula;
+      formula === ZEM_RANGE_FORMULA ? `Varies from ${zemLow} to ${max}` : formula;
     grid.appendChild(
       el("div", { class: "explain-block" }, [
         el("div", { class: "eb-title" }, title),
