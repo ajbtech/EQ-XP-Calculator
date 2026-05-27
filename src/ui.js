@@ -708,12 +708,7 @@ function build() {
   app.appendChild(
     el("div", { class: "banner" }, [
       el("strong", {}, "Estimates only. "),
-      "ZEMs and the per-level XP curve are community best-guesses (the P99 wiki calls its ZEMs “almost entirely speculative”). Results are approximate. ",
-      el(
-        "a",
-        { href: zems.sourceUrl, target: "_blank", rel: "noopener" },
-        "Source ↗",
-      ),
+      "Both equations and ZEM have changed over time and accurate sources are sparse. Please see the README at the bottom of the page for more detail.",
     ]),
   );
 
