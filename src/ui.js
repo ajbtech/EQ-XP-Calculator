@@ -18,6 +18,7 @@ import { loadZems, continentGroups, zemForZone } from "./data.js";
 import { renderMarkdown } from "./markdown.js";
 
 const MAX_LEVEL = 60;
+const MAX_MOB_LEVEL = 70;
 
 const state = {
   party: [
@@ -350,13 +351,13 @@ function buildEncounter() {
   const mob = el("input", {
     type: "number",
     min: "1",
-    max: String(MAX_LEVEL),
+    max: String(MAX_MOB_LEVEL),
     value: String(state.enc.mobLevel),
     class: "big-input",
     "aria-label": "mob level",
   });
   mob.addEventListener("input", () => {
-    const v = clamp(Math.round(+mob.value || 1), 1, MAX_LEVEL);
+    const v = clamp(Math.round(+mob.value || 1), 1, MAX_MOB_LEVEL);
     state.enc.mobLevel = v;
     if (String(v) !== mob.value) mob.value = String(v);
     refresh();
