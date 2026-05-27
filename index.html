@@ -3,88 +3,31 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>EQ XP Calculator (P99)</title>
-    <style>
-      :root {
-        color-scheme: light dark;
-      }
-      body {
-        font-family: system-ui, sans-serif;
-        line-height: 1.5;
-        max-width: 48rem;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-      }
-      h1 {
-        margin-bottom: 0.25rem;
-      }
-      h2 {
-        margin-top: 2rem;
-        border-bottom: 1px solid
-          color-mix(in srgb, currentColor 20%, transparent);
-        padding-bottom: 0.25rem;
-      }
-      a {
-        color: inherit;
-      }
-      code {
-        font-family: ui-monospace, monospace;
-        font-size: 0.9em;
-        background: color-mix(in srgb, currentColor 10%, transparent);
-        padding: 0.1em 0.3em;
-        border-radius: 4px;
-      }
-      pre {
-        background: color-mix(in srgb, currentColor 10%, transparent);
-        padding: 0.75rem 1rem;
-        border-radius: 6px;
-        overflow-x: auto;
-      }
-      pre code {
-        background: none;
-        padding: 0;
-      }
-      table {
-        border-collapse: collapse;
-        margin: 1rem 0;
-      }
-      th,
-      td {
-        border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
-        padding: 0.35rem 0.75rem;
-        text-align: left;
-      }
-      .error {
-        opacity: 0.8;
-        font-size: 0.95rem;
-      }
-    </style>
+    <title>P99 XP Calculator</title>
+    <meta
+      name="description"
+      content="An honest EverQuest Project 1999 XP calculator: per-character kills and time to level for your party."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main id="content">
+    <div id="app">
       <noscript>
-        This page renders the project README, which requires JavaScript. See
-        <a href="https://github.com/ajbtech/EQ-XP-Calculator#readme"
-          >the README on GitHub</a
-        >.
+        <p style="padding: 2rem">
+          This calculator needs JavaScript. See
+          <a href="https://github.com/ajbtech/EQ-XP-Calculator#readme"
+            >the README on GitHub</a
+          >
+          for the project and its formulas.
+        </p>
       </noscript>
-    </main>
-    <script type="module">
-      import { renderMarkdown } from "./src/markdown.js";
-
-      const content = document.getElementById("content");
-      try {
-        const res = await fetch("./README.md");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const md = await res.text();
-        content.innerHTML = renderMarkdown(md);
-      } catch (err) {
-        content.innerHTML =
-          '<p class="error">Could not load the README. ' +
-          'See <a href="https://github.com/ajbtech/EQ-XP-Calculator#readme">' +
-          "the README on GitHub</a>.</p>";
-        console.error(err);
-      }
-    </script>
+    </div>
+    <script type="module" src="./src/ui.js"></script>
   </body>
 </html>

@@ -2,7 +2,7 @@
 // browser and node:test. It supports only the subset of Markdown the project's
 // README uses: ATX headings, paragraphs (soft-wrapped lines joined), unordered
 // lists, fenced code blocks, GitHub-style tables, and the inline spans bold,
-// italic, inline code, and links.
+// italic, inline code, links, and images.
 //
 // All text is HTML-escaped and link URLs are sanitized, so rendering a trusted
 // local file (README.md) cannot inject markup or javascript: URLs.
@@ -35,6 +35,11 @@ function renderInline(text) {
 
   let out = text.replace(/`([^`]+)`/g, (_, code) =>
     stash(`<code>${escapeHtml(code)}</code>`),
+  );
+  out = out.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) =>
+    stash(
+      `<img src="${escapeHtml(sanitizeUrl(src))}" alt="${escapeHtml(alt)}" />`,
+    ),
   );
   out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, url) =>
     stash(`<a href="${escapeHtml(sanitizeUrl(url))}">${escapeHtml(label)}</a>`),
