@@ -30,6 +30,10 @@ xpToReachLevel(L) = totalXpToLevel(L) - totalXpToLevel(L - 1)
 The exact per-level totals are not wiki-verified, so the cubic is the adopted
 community-style estimate.
 
+![Cumulative XP to achieve each level, levels 1–60, modifier 1.0](xp-per-level.svg)
+
+![XP required to reach the next level, levels 1–60, modifier 1.0](xp-to-next-level.svg)
+
 ### 2. Race / class modifiers
 
 These are XP-**to-level** multipliers: a penalty (`> 1`) means you need *more*
@@ -99,6 +103,8 @@ kills = ceil((xpToNextLevel - xpSoFar) / xpPerKill)
 2013): a single kill can grant at most 11% of the XP needed for your current
 level. Excess XP above the cap is simply lost, not redistributed. A mob that
 cons deep green awards 0 XP, so it can never level you (kills → infinite).
+
+![Kills to reach the next level against a same-level white-con mob, solo, ZEM 75](kills-to-next-level.svg)
 
 ### 7. Group split
 
