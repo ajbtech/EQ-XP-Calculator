@@ -638,7 +638,7 @@ const EXPLAIN = [
   ],
   [
     "Race / class modifiers",
-    null,
+    "×0.86 (Halfling Warrior) – ×1.68 (Troll SK)",
     "Intended to balance the fact that some races and classes were more powerful than others. Class modifiers were turned off in the Velious timeline.",
   ],
 ];
