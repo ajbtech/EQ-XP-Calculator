@@ -349,11 +349,35 @@ late Velious era.
 
 
 ### 10. Group Split
+There are two different methods to split XP, depending on whether or not class 
+penalties are in effect. At launch, XP was split between characters based on their
+experience, rather than their level. Because some race/class combos required
+substantially more XP to level (Troll SK = 1.68 modifier), those race/class combos
+would also receive a proportionately larger amount of group XP. The result was that
+players in the same group would level at the same rate, but effectively be penalizing
+characters without XP penalties.
 
-Second, that party total is **split between members in proportion to each
-member's cumulative XP so far** (`xpSoFar`) — higher-level members take a larger
-share. A level-1 member (0 cumulative XP) is floored to a baseline weight so it
-still receives a share rather than 0%.
+When class penalties were removed, the split was adjusted to be "based on level", but
+the specific way that this was implemented in unclear. As a result, it is assumed
+that the method matches the previous implementation, but removes both race and class 
+bonuses when splitting XP in a group. The result would be a split exclusively "based
+on level", but still broadly proportional to the previous method when grouping with 
+different level characters.
+
+It is further unknown if either of these splits were based on XP at start of current 
+level, cumulative XP
+(including progress in this level), or cumulative XP to next level. Because the 
+first two methods break down for new charcters (0 XP at start of level and 0 
+cumulative XP, resulting in no XP for these characters), it is assumed that the 
+third method is used. As a result, the calculator does the split based on cumulative 
+XP to next level. 
+
+If class penalties are enabled, a larger share goes to class/race
+combos with penalties and a smaller share goes to class/race combos with bonuses.
+If class penalties are not enabled, the split ignores both the class and race
+bonus/penalty, but race bonus/penalty will still come into play to determine kills
+to next level.
+
 
 ## References
 
