@@ -28,17 +28,17 @@ const isFilled = (c) =>
 
 const state = {
   party: [
-    { race: "Barbarian", className: "Warrior", level: 42 },
-    { race: "High Elf", className: "Cleric", level: 41 },
-    { race: "Dark Elf", className: "Necromancer", level: 43 },
-    { race: "Ogre", className: "Shaman", level: 40 },
-    { race: "Wood Elf", className: "Ranger", level: 41 },
+    { race: "Troll", className: "Shadow Knight", level: 1 },
+    emptyMember(),
+    emptyMember(),
+    emptyMember(),
+    emptyMember(),
     emptyMember(),
   ],
   enc: {
-    mobLevel: 44,
+    mobLevel: 1,
     minutesPerKill: 6,
-    zoneName: "Lower Guk",
+    zoneName: "Innothule Swamp",
     useManualZem: false,
     manualZem: 75,
     penaltiesOn: false,
@@ -266,11 +266,11 @@ const COLS = [
   { id: "rc", label: "race", cls: "c-rc" },
   { id: "cl", label: "class", cls: "c-cl" },
   { id: "lv", label: "lvl", cls: "c-lv num" },
-  { id: "sh", label: "share", cls: "c-sh num" },
+  { id: "sh", label: "split", cls: "c-sh num" },
   { id: "gk", label: "+ / kill", cls: "c-gk num gain" },
   { id: "gp", label: "gain %", cls: "c-gp num soft" },
-  { id: "kl", label: "kills →", cls: "c-kl num accent" },
-  { id: "tm", label: "time →", cls: "c-tm num accent" },
+  { id: "kl", label: "kills → lvl", cls: "c-kl num accent" },
+  { id: "tm", label: "time → lvl", cls: "c-tm num accent" },
 ];
 
 function buildSheet() {
@@ -722,7 +722,7 @@ function build() {
     el(
       "div",
       { class: "sheet-note" },
-      "Cells edit in place. Hit ✕ to wipe a line clean; fill an empty row's race, class, and level to add a member. Class is shown for completeness — on P99 it has no XP effect.",
+      "Cells edit in place. Hit ✕ to wipe a line clean; fill an empty row's race, class, and level to add a member.",
     ),
   ]);
 
