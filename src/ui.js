@@ -18,19 +18,26 @@ import { loadZems, continentGroups, zemForZone } from "./data.js";
 import { renderMarkdown } from "./markdown.js";
 
 const MAX_LEVEL = 60;
+const MAX_MOB_LEVEL = 70;
+
+// A row counts toward the party only when fully filled in. Clearing a row
+// (the ✕ button) blanks these fields, leaving an empty slot to refill.
+const emptyMember = () => ({ race: "", className: "", level: null });
+const isFilled = (c) =>
+  Boolean(c.race) && Boolean(c.className) && Number.isFinite(c.level);
 
 const state = {
   party: [
-    { race: "Barbarian", className: "Warrior", level: 42, active: true },
-    { race: "High Elf", className: "Cleric", level: 41, active: true },
-    { race: "Dark Elf", className: "Necromancer", level: 43, active: true },
-    { race: "Ogre", className: "Shaman", level: 40, active: true },
-    { race: "Wood Elf", className: "Ranger", level: 41, active: true },
-    { race: "Gnome", className: "Enchanter", level: 42, active: false },
+    { race: "Barbarian", className: "Warrior", level: 42 },
+    { race: "High Elf", className: "Cleric", level: 41 },
+    { race: "Dark Elf", className: "Necromancer", level: 43 },
+    { race: "Ogre", className: "Shaman", level: 40 },
+    { race: "Wood Elf", className: "Ranger", level: 41 },
+    emptyMember(),
   ],
   enc: {
     mobLevel: 44,
-    minutesPerKill: 0.8,
+    minutesPerKill: 6,
     zoneName: "Lower Guk",
     useManualZem: false,
     manualZem: 75,
@@ -76,7 +83,7 @@ function compute() {
   const activeIdx = [];
   const combos = [];
   state.party.forEach((c, i) => {
-    if (c.active) {
+    if (isFilled(c)) {
       activeIdx.push(i);
       combos.push({ race: c.race, className: c.className, level: c.level });
     }
@@ -110,7 +117,7 @@ function refresh() {
 
   state.party.forEach((c, i) => {
     const r = refs.rows[i];
-    r.rowEl.classList.toggle("row-dim", !c.active);
+    r.rowEl.classList.toggle("row-dim", !isFilled(c));
     const k = activeIdx.indexOf(i);
     const player = result && k >= 0 ? result.players[k] : null;
 
@@ -150,7 +157,7 @@ function refresh() {
 
   // Totals row.
   const activeN = activeIdx.length;
-  refs.totals.nm.textContent = `Σ active ${activeN}/6`;
+  refs.totals.nm.textContent = `Σ party ${activeN}/6`;
   refs.totals.sh.textContent = result ? "100%" : "—";
   refs.totals.gk.textContent = result ? "+" + fmtNum(result.total) : "—";
 
@@ -222,8 +229,13 @@ function checkbox(get, set, onChange) {
   return btn;
 }
 
-function selectEl(values, current, onChange, className) {
+function selectEl(values, current, onChange, className, includeEmpty) {
   const sel = el("select", { class: className || "" });
+  if (includeEmpty) {
+    sel.appendChild(
+      el("option", { value: "", ...(current ? {} : { selected: "" }) }, "—"),
+    );
+  }
   for (const v of values) {
     sel.appendChild(
       el("option", { value: v, ...(v === current ? { selected: "" } : {}) }, v),
@@ -231,6 +243,22 @@ function selectEl(values, current, onChange, className) {
   }
   sel.addEventListener("change", () => onChange(sel.value));
   return sel;
+}
+
+// A bare ✕ button that wipes a party row clean.
+function clearButton(onClick) {
+  const btn = el(
+    "button",
+    {
+      class: "row-clear",
+      type: "button",
+      title: "Clear this line",
+      "aria-label": "clear line",
+    },
+    "✕",
+  );
+  btn.addEventListener("click", onClick);
+  return btn;
 }
 
 const COLS = [
@@ -259,34 +287,51 @@ function buildSheet() {
   state.party.forEach((c) => {
     const cells = {};
 
-    const cb = checkbox(
-      () => c.active,
+    const race = selectEl(
+      RACE_VALUES,
+      c.race,
       (v) => {
-        c.active = v;
+        c.race = v;
+        refresh();
       },
-      refresh,
+      "",
+      true,
     );
-
-    const race = selectEl(RACE_VALUES, c.race, (v) => {
-      c.race = v;
-      refresh();
-    });
-    const klass = selectEl(CLASS_VALUES, c.className, (v) => {
-      c.className = v;
-      refresh();
-    });
+    const klass = selectEl(
+      CLASS_VALUES,
+      c.className,
+      (v) => {
+        c.className = v;
+        refresh();
+      },
+      "",
+      true,
+    );
 
     const level = el("input", {
       type: "number",
       min: "1",
       max: String(MAX_LEVEL),
-      value: String(c.level),
+      value: c.level == null ? "" : String(c.level),
       "aria-label": "level",
     });
     level.addEventListener("input", () => {
+      if (level.value === "") {
+        c.level = null;
+        refresh();
+        return;
+      }
       const v = clamp(Math.round(+level.value || 1), 1, MAX_LEVEL);
       c.level = v;
       if (String(v) !== level.value) level.value = String(v);
+      refresh();
+    });
+
+    const clear = clearButton(() => {
+      Object.assign(c, emptyMember());
+      race.value = "";
+      klass.value = "";
+      level.value = "";
       refresh();
     });
 
@@ -301,7 +346,7 @@ function buildSheet() {
     cells.kl = kl;
     cells.tm = tm;
 
-    const contents = [cb, race, klass, level, sh, gk, gp, kl, tm];
+    const contents = [clear, race, klass, level, sh, gk, gp, kl, tm];
     const rowCells = COLS.map((col, j) =>
       el("div", { class: `cell ${col.cls}` }, contents[j]),
     );
@@ -350,13 +395,13 @@ function buildEncounter() {
   const mob = el("input", {
     type: "number",
     min: "1",
-    max: String(MAX_LEVEL),
+    max: String(MAX_MOB_LEVEL),
     value: String(state.enc.mobLevel),
     class: "big-input",
     "aria-label": "mob level",
   });
   mob.addEventListener("input", () => {
-    const v = clamp(Math.round(+mob.value || 1), 1, MAX_LEVEL);
+    const v = clamp(Math.round(+mob.value || 1), 1, MAX_MOB_LEVEL);
     state.enc.mobLevel = v;
     if (String(v) !== mob.value) mob.value = String(v);
     refresh();
@@ -677,7 +722,7 @@ function build() {
     el(
       "div",
       { class: "sheet-note" },
-      "Cells edit in place. Toggle the checkbox to drop a member from the split. Class is shown for completeness — on P99 it has no XP effect.",
+      "Cells edit in place. Hit ✕ to wipe a line clean; fill an empty row's race, class, and level to add a member. Class is shown for completeness — on P99 it has no XP effect.",
     ),
   ]);
 
