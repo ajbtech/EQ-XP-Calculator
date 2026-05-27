@@ -362,10 +362,12 @@ a {
   max-width: 190px;
   cursor: pointer;
 }
-.enc-field select option,
-.enc-field select optgroup {
-  background: var(--card-bg);
-  color: var(--text);
+/* Native option menus render on the OS's (light) background; force dark text so
+   they stay readable regardless of the dark theme. */
+select option,
+select optgroup {
+  background: #ffffff;
+  color: #1a1a1a;
 }
 
 .con-readout {
