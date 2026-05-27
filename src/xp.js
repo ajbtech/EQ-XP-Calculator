@@ -18,6 +18,7 @@ export { raceModifier } from "./race.js";
 export { classModifier } from "./class.js";
 export { hellMod } from "./hell.js";
 export { groupBonus } from "./group.js";
+export { groupXpEligibility } from "./eligibility.js";
 export { consider } from "./consider.js";
 export { mobXp } from "./mob.js";
 export { totalXpToLevel, xpToReachLevel } from "./level.js";
