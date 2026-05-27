@@ -378,6 +378,20 @@ If class penalties are not enabled, the split ignores both the class and race
 bonus/penalty, but race bonus/penalty will still come into play to determine kills
 to next level.
 
+The full table below is generated from the engine
+(`scripts/generate-consider-table.js`); each row is tinted with its consider
+color, and light/dark green collapse to a single green.
+
+![Consider color, message, and XP modifier by character level and mob-level difference](consider-colors.svg)
+
+### 9. Max level split (group level spread)
+
+In EverQuest, a group whose members span too wide a level range is penalized:
+members far below the top level can fall "out of range" and receive reduced or
+no XP, and the spread can shrink the overall group XP. **The calculator does not
+currently model this level-spread penalty** beyond the con-range effect in item
+8 (which keys off the highest member). Treat XP for very wide-spread groups as
+optimistic until this is modeled.
 
 ## References
 
