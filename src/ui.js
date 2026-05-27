@@ -623,8 +623,8 @@ const EXPLAIN = [
   ],
   [
     "XP to next level",
-    "lvl³ × race × hell × 1000",
-    "Each level costs roughly the cube of its number. Hell levels (51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
+    "lvl³ × race × class × hell × 1000",
+    "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
   ],
   [
     "11% per-mob cap",
