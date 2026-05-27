@@ -248,6 +248,11 @@ a {
 .cell.num input {
   text-align: right;
 }
+.cell select option,
+.cell select optgroup {
+  background: var(--card-bg);
+  color: var(--text);
+}
 .cell select {
   cursor: pointer;
 }
