@@ -642,20 +642,13 @@ function buildExplainer() {
       ]),
     );
   }
-  const howDetails = el("details", {}, [
-    summary("How experience works on P99"),
+  const howSection = el("section", { class: "explain-section" }, [
+    sectionHead("How experience works on P99"),
     grid,
   ]);
 
   const readmeBody = el("div", { class: "readme" }, "Loading…");
-  let readmeLoaded = false;
-  const readmeDetails = el("details", {}, [
-    summary("Project README"),
-    readmeBody,
-  ]);
-  readmeDetails.addEventListener("toggle", async () => {
-    if (!readmeDetails.open || readmeLoaded) return;
-    readmeLoaded = true;
+  (async () => {
     try {
       const res = await fetch("./README.md");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -664,16 +657,17 @@ function buildExplainer() {
       readmeBody.innerHTML =
         '<p>Could not load the README. See <a href="https://github.com/ajbtech/EQ-XP-Calculator#readme">it on GitHub</a>.</p>';
     }
-  });
+  })();
+  const readmeSection = el("section", { class: "explain-section" }, [
+    sectionHead("Project README"),
+    readmeBody,
+  ]);
 
-  return el("div", { class: "explainer" }, [howDetails, readmeDetails]);
+  return el("div", { class: "explainer" }, [howSection, readmeSection]);
 }
 
-function summary(label) {
-  return el("summary", {}, [
-    el("span", {}, label + " →"),
-    el("span", { class: "toggle" }, "expand"),
-  ]);
+function sectionHead(label) {
+  return el("div", { class: "explain-head" }, label);
 }
 
 // ── assemble ─────────────────────────────────────────────
