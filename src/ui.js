@@ -724,11 +724,11 @@ function build() {
       { class: "sheet-note" },
       "Cells edit in place. Hit ✕ to wipe a line clean; fill an empty row's race, class, and level to add a member. Class is shown for completeness — on P99 it has no XP effect.",
     ),
+    buildGroupBonus(),
   ]);
 
   const right = el("div", { class: "pane-right" }, [
     buildEncounter(),
-    buildGroupBonus(),
     buildConstants(),
   ]);
 
