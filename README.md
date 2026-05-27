@@ -1,6 +1,9 @@
 # EQ-XP-Calculator
 This app helps you understand how many mobs you need to defeat per level and accounts for XP in groups.
 
+## Disclaimer
+Over the course of its life, Everquest has changed modifiers, hell levels, ZEM and xp to level. There are also several places where hard sources of truth do not exist, so assumptions must be made. As a result, any calculator will be wrong. This calculator optimizes for the Project 1999 server, but should generally be applicable to TLPs during the classic era. Treat all results as approximate. Feel free to provide feedback and corrections to Gorrek at ajbtechinfo@gmail.com
+
 ## How experience works in Project 1999
 
 EverQuest experience on Project 1999 (P99) is a chain of multipliers, not a
@@ -27,9 +30,6 @@ The XP for a *single* level is the difference between two cumulative totals:
 xpToReachLevel(L) = totalXpToLevel(L) - totalXpToLevel(L - 1)
 ```
 
-The exact per-level totals are not wiki-verified, so the cubic is the adopted
-community-style estimate.
-
 ![Cumulative XP to achieve each level, levels 1–60, modifier 1.0](xp-per-level.svg)
 
 ![XP required to reach the next level, levels 1–60, modifier 1.0](xp-to-next-level.svg)
@@ -37,11 +37,11 @@ community-style estimate.
 ### 2. Race / class modifiers
 
 These are XP-**to-level** multipliers: a penalty (`> 1`) means you need *more*
-XP to level; a bonus (`< 1`) means *less*. Per the wiki, race and class
+XP to level; a bonus (`< 1`) means *less*. Race and class
 multipliers are **multiplied together**, not added (e.g. a Troll SK = 1.2 race
 × 1.4 class = 1.68).
 
-**Race modifiers (always in effect on P99):**
+**Race modifiers:**
 
 | Race | Modifier |
 |---|---|
@@ -52,28 +52,29 @@ multipliers are **multiplied together**, not added (e.g. a Troll SK = 1.2 race
 | Halfling | 0.95 (+5%) |
 | all others | 1.00 |
 
-**Class modifiers — removed on P99.** P99 removed class XP penalties (Blue/Red
+**Class modifiers — removed on P99.** During the earliest eras, specifc classes 
+had further penalties to help balance the face that some classes would otherwise
+level faster than others. Due to improved balancing, these modifiers were later
+removed (Jan 14, 2001 Patch - Velious Era). 
+
+P99 removed class XP penalties (Blue/Red
 since 2015-09-21, Green since 2021-08-10), so on P99 `C = 1.0`. The historical
-classic-EQ values (Paladin/SK/Ranger/Bard 1.4, Monk 1.2, Wizard/Mage/Enchanter/
-Necromancer 1.1, Rogue 0.91, Warrior 0.90) are retained for reference/comparison
-only and are not applied unless penalties are explicitly toggled on.
+classic-EQ values 
 
-### 3. XP per mob
+| Class | Modifier |
+|---|---|
+| Paladin/SK/Ranger/Bard | 1.40 (−40%) |
+| Monk | 1.20 (−20%) |
+| Wizard/Mage/Enchanter/Necromancer | 1.10 (−10%) |
+| Rogue | 0.91 (+9%) |
+| Warrior | 0.90 (+10%) |
+| all others | 1.00 |
 
-The base XP a single mob is worth, before group, con, or cap adjustments:
+The calculator allows the user to select whether or not class penalties are in
+effect. Notably this selection also changes the method of how XP is split
+within a group which took place in the same patch (see below).
 
-```
-mobXp = mobLevel^2 * ZEM
-```
-
-### 4. ZEM (Zone Experience Modifier)
-
-`ZEM` is a per-zone multiplier where **75 = "normal"**. P99 ZEMs are **custom
-and unpublished** — the standard ShowEQ/EQEmu values are wrong for P99 — so the
-calculator uses community best-guess values from the wiki and labels them as
-estimates.
-
-### 5. Hell levels
+### 3. Hell levels
 
 "Hell levels" cost progressively more XP. `H` is a multiplier (`>= 1.0`) applied
 to the XP **requirement** (item 1), not to per-kill gain:
@@ -90,6 +91,21 @@ to the XP **requirement** (item 1), not to per-kill gain:
 | 53 | 1.7 | | |
 
 (Note: the table jumps 1.7 → 1.9 between 53 and 54.)
+
+### 4. XP per mob
+
+The base XP a single mob is worth, before group, con, or cap adjustments:
+
+```
+mobXp = mobLevel^2 * ZEM
+```
+
+### 5. ZEM (Zone Experience Modifier)
+
+`ZEM` is a per-zone multiplier where **75 = "normal"**. P99 ZEMs are **custom
+and unpublished** — the standard ShowEQ/EQEmu values are wrong for P99 — so the
+calculator uses community best-guess values from the wiki and labels them as
+estimates.
 
 ### 6. Number of mobs needed per level
 
