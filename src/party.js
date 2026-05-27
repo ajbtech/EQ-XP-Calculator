@@ -19,6 +19,8 @@ const MAX_PARTY = 6;
  *   validated members, in input order
  * @property {number} size      number of members, 1-6
  * @property {number} maxLevel  highest member level
+ * @property {boolean} penaltiesInEffect  whether class penalties apply; read by
+ *   splitXp to choose the XP-distribution method
  */
 
 /**
@@ -51,5 +53,6 @@ export function makeParty(combos, penaltiesInEffect) {
     characters: Object.freeze(characters),
     size: characters.length,
     maxLevel: Math.max(...characters.map((c) => c.level)),
+    penaltiesInEffect,
   });
 }
