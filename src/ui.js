@@ -134,7 +134,7 @@ function refresh() {
     const share = shares[k].share * 100;
     r.sh.textContent = share.toFixed(0) + "%";
 
-    r.gk.textContent = "+" + fmtNum(player.xpPerKill);
+    r.gk.textContent = "+" + fmtNum(player.xpPerKill) + " XP";
     if (player.capApplied) {
       r.gk.appendChild(el("span", { class: "cap-flag" }, " *"));
       r.gk.title = "11% per-mob cap applied — excess XP is lost";
@@ -159,7 +159,9 @@ function refresh() {
   const activeN = activeIdx.length;
   refs.totals.nm.textContent = `party ${activeN}/6`;
   refs.totals.sh.textContent = result ? "100%" : "—";
-  refs.totals.gk.textContent = result ? "+" + fmtNum(result.total) : "—";
+  refs.totals.gk.textContent = result
+    ? "+" + fmtNum(result.total) + " XP"
+    : "—";
 
   // Encounter ZEM readout.
   const zemOk = Number.isFinite(zem) && zem > 0;
