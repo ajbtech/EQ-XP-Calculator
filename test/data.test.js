@@ -7,6 +7,7 @@ import {
   flattenZones,
   continentGroups,
   zemForZone,
+  zemRange,
   loadZems,
 } from "../src/data.js";
 
@@ -51,6 +52,10 @@ test("zemForZone resolves a zone to its ZEM regardless of continent", () => {
 
 test("zemForZone returns undefined for an unknown zone", () => {
   assert.equal(zemForZone(zems, "Atlantis"), undefined);
+});
+
+test("zemRange returns the lowest and highest ZEM across all zones", () => {
+  assert.deepEqual(zemRange(zems), { min: 83, max: 144 });
 });
 
 test("loadZems fetches and parses the snapshot", async () => {
