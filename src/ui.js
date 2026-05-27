@@ -612,9 +612,14 @@ const EXPLAIN = [
     "P99 ZEMs are custom and unpublished. These are community best-guesses from the wiki — not official numbers. Treat them as approximate.",
   ],
   [
-    "Group split + bonus",
-    "share × bonus(size)",
-    "Larger groups earn a bonus: 3 = +6%, 6 = +20%. XP splits across members by accumulated XP; inactive members don't share or count toward size.",
+    "Group bonus",
+    "bonus(size)",
+    "A group-size bonus multiplies the party's total XP per kill (P99's late-Velious values): 2 = +2%, 3 = +6%, 4 = +10%, 5 = +14%, 6 = +20%. Inactive members don't count toward size.",
+  ],
+  [
+    "Group split",
+    "share by level",
+    "The party's XP splits across active members by their cumulative XP to next level. With class penalties off, the split is purely level-based (race/class modifiers removed); with them on, penalized combos take a larger share. Inactive members don't share.",
   ],
   [
     "XP to next level",
