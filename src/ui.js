@@ -10,6 +10,8 @@ import {
   mobXp,
   groupBonus,
   consider,
+  raceModifier,
+  classModifier,
   RACE_VALUES,
   CLASS_VALUES,
 } from "./xp.js";
@@ -68,7 +70,14 @@ function el(tag, props = {}, children = []) {
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
 // Refs to nodes that refresh() updates, filled during build.
-const refs = { rows: [], totals: {}, enc: {}, bonusCells: [], constants: {} };
+const refs = {
+  rows: [],
+  totals: {},
+  enc: {},
+  bonusCells: [],
+  constants: {},
+  classSelects: [],
+};
 let zems = null;
 
 // ── core calculation ─────────────────────────────────────
@@ -234,7 +243,24 @@ function checkbox(get, set, onChange) {
   return btn;
 }
 
-function selectEl(values, current, onChange, className, includeEmpty) {
+// A signed-percent suffix for an XP-to-level multiplier, in the wiki's "bonus
+// (+) / penalty (−)" convention: a multiplier below 1 needs less XP (a bonus),
+// above 1 needs more (a penalty). Returns "" for a neutral 1.0 modifier.
+function modSuffix(modifier) {
+  const pct = Math.round((1 - modifier) * 100);
+  if (pct === 0) return "";
+  return pct > 0 ? ` (+${pct}%)` : ` (−${-pct}%)`;
+}
+
+function selectEl(
+  values,
+  current,
+  onChange,
+  className,
+  includeEmpty,
+  labelFor,
+) {
+  const label = labelFor || ((v) => v);
   const sel = el("select", { class: className || "" });
   if (includeEmpty) {
     sel.appendChild(
@@ -243,11 +269,27 @@ function selectEl(values, current, onChange, className, includeEmpty) {
   }
   for (const v of values) {
     sel.appendChild(
-      el("option", { value: v, ...(v === current ? { selected: "" } : {}) }, v),
+      el(
+        "option",
+        { value: v, ...(v === current ? { selected: "" } : {}) },
+        label(v),
+      ),
     );
   }
   sel.addEventListener("change", () => onChange(sel.value));
   return sel;
+}
+
+// Class penalties toggle on/off, so the class dropdowns' penalty suffixes must
+// be rewritten to match (race suffixes are always in effect and never change).
+function relabelClassOptions() {
+  for (const sel of refs.classSelects) {
+    for (const opt of sel.options) {
+      if (opt.value === "") continue;
+      opt.textContent =
+        opt.value + modSuffix(classModifier(opt.value, state.enc.penaltiesOn));
+    }
+  }
 }
 
 // A bare ✕ button that wipes a party row clean.
@@ -301,6 +343,7 @@ function buildSheet() {
       },
       "",
       true,
+      (v) => v + modSuffix(raceModifier(v)),
     );
     const klass = selectEl(
       CLASS_VALUES,
@@ -311,7 +354,9 @@ function buildSheet() {
       },
       "",
       true,
+      (v) => v + modSuffix(classModifier(v, state.enc.penaltiesOn)),
     );
+    refs.classSelects.push(klass);
 
     const level = el("input", {
       type: "number",
@@ -520,7 +565,10 @@ function buildEncounter() {
     (v) => {
       state.enc.penaltiesOn = v;
     },
-    refresh,
+    () => {
+      relabelClassOptions();
+      refresh();
+    },
   );
   const toggle = el("div", { class: "toggle-row" }, [
     el("span", { class: "enc-label" }, "class XP penalties"),
