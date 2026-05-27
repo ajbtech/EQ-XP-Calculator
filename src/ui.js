@@ -627,9 +627,14 @@ const EXPLAIN = [
     "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
   ],
   [
-    "11% per-mob cap",
-    "min(slice, 11% of bar)",
-    "Since 2013 a single kill grants at most 11% of your current level's XP; any excess is lost. Capped per-kill values are marked with *.",
+    "Con modifier",
+    "by con color",
+    "A mob's “consider” color scales its XP: red/yellow/white/blue give full XP (×1.0), while green cons are trivial and award reduced or no XP (×0, 0.25, or 0.5). In a group the con is computed against the highest-level member, not each player.",
+  ],
+  [
+    "Group level range",
+    "low×1.5 / high×0.667",
+    "A group can only span so wide a level gap before low members fall out of range and earn no XP. The range is the lowest level ×1.5 (round down) or the highest level ×0.667 (round up), and always at least 5 levels. E.g. a 20 can group up to a 30; a 30 can group down to a 20.",
   ],
   [
     "Race / class modifiers",
