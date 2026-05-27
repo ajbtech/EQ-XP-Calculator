@@ -636,11 +636,6 @@ const EXPLAIN = [
     "ceil(levelXP ÷ perKill)",
     "Kills-to-level uses your slice after the group bonus, split, and cap. Time-to-level multiplies by your minutes-per-kill assumption.",
   ],
-  [
-    "Caveats",
-    null,
-    "Numbers approximate classic/Kunark-era P99. AA, Lesson, raid mobs, named multipliers, and exact ZEMs are not modeled.",
-  ],
 ];
 
 function buildExplainer() {
