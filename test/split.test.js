@@ -117,6 +117,58 @@ test("the level-1 weight is a flat 1000, ignoring the modifier", () => {
   assert.ok(close(result[1].share, 0.5));
 });
 
+test("a member too far below the group's max level earns nothing", () => {
+  // L1 with an L8: L1's cap is max(floor(1.5), 6) = 6, and 8 > 6, so the L1 is
+  // ineligible and gets a 0 share; the L8 absorbs the whole pool.
+  const result = splitXp(
+    partyOff(
+      m(RACES.HUMAN, CLASSES.CLERIC, 1),
+      m(RACES.HUMAN, CLASSES.CLERIC, 8),
+    ),
+  );
+  assert.equal(result[0].share, 0);
+  assert.equal(result[1].share, 1);
+});
+
+test("an ineligible member is zeroed even with penalties on", () => {
+  // The level-1 baseline weight does not rescue an ineligible member: L1 cap is
+  // 6, the group max is 8, so the L1 still gets nothing.
+  const result = splitXp(
+    party(m(RACES.HUMAN, CLASSES.CLERIC, 1), m(RACES.HUMAN, CLASSES.CLERIC, 8)),
+  );
+  assert.equal(result[0].share, 0);
+  assert.equal(result[1].share, 1);
+});
+
+test("a member right at the eligibility boundary still earns a share", () => {
+  // L1 with an L6: L1's cap is exactly 6, so the L1 is still eligible.
+  const result = splitXp(
+    partyOff(
+      m(RACES.HUMAN, CLASSES.CLERIC, 1),
+      m(RACES.HUMAN, CLASSES.CLERIC, 6),
+    ),
+  );
+  assert.ok(result[0].share > 0);
+  assert.ok(result[1].share > 0);
+});
+
+test("eligible members still split the whole pool when one is ineligible", () => {
+  // L20 + L21 are both eligible (cap 30/31), the L1 is not (cap 6 < max 21);
+  // the two eligible members split 50/50 and the shares sum to 1.
+  const result = splitXp(
+    partyOff(
+      m(RACES.HUMAN, CLASSES.CLERIC, 1),
+      m(RACES.HUMAN, CLASSES.CLERIC, 20),
+      m(RACES.HUMAN, CLASSES.CLERIC, 20),
+    ),
+  );
+  assert.equal(result[0].share, 0);
+  assert.ok(close(result[1].share, 0.5));
+  assert.ok(close(result[2].share, 0.5));
+  const sum = result.reduce((s, r) => s + r.share, 0);
+  assert.ok(close(sum, 1));
+});
+
 test("shares always sum to 1", () => {
   const result = splitXp(
     party(
