@@ -1,21 +1,30 @@
 # EQ-XP-Calculator
-
-This app helps you understand how many mobs you need to defeat per level and
-accounts for XP in groups.
+This app helps you understand how many mobs you need to defeat per level and accounts for XP in groups.
 
 ## Disclaimer
 Over the course of its life, Everquest has changed modifiers, hell levels, ZEM and xp to level. There are also several places where hard sources of truth do not exist, so assumptions must be made. As a result, any calculator can be at best an approximation and can't be correct for all eras. 
 
 This calculator optimizes for the Project 1999 server, but should generally be applicable to TLPs during the classic era. Treat all results as approximate. Feel free to provide feedback and corrections to Gorrek at ajbtechinfo@gmail.com
 
-## How experience works in Project 1999
+## 1. XP per mob
 
-EverQuest experience on Project 1999 (P99) is a chain of multipliers, not a
-single number. This section explains each piece the calculator models. Many of
-the constants — especially ZEMs and the per-level curve — are **community
-estimates, not published values**, so treat results as approximate.
+The base XP a single mob is worth, before group, con, or cap adjustments:
 
-## 1. XP per level
+```
+baseMobXp = mobLevel^2 * ZEM
+```
+
+## 2. ZEM (Zone Experience Modifier)
+
+`ZEM` is a per-zone multiplier where **75 = "normal"**. ZEM values have changed
+over time and most published sources should be considered unrelaible. This calculator
+uses the ZEM based on the P99 wiki, but individual ZEM values can be entered as well
+if a good source of truth is known.
+
+ZEM values were intended to help balance the danger of various zones (typically
+dungeons).
+
+## 3. XP per level
 
 The cumulative XP to reach a level follows a cubic curve:
 
@@ -38,7 +47,7 @@ xpToReachLevel(L) = totalXpToLevel(L) - totalXpToLevel(L - 1)
 
 ![XP required to reach the next level, levels 1–60, modifier 1.0](xp-to-next-level.svg)
 
-## 2. Race / class modifiers
+## 4. Race / class modifiers
 
 These are XP-**to-level** multipliers: a penalty (`> 1`) means you need *more*
 XP to level; a bonus (`< 1`) means *less*. Race and class
@@ -78,8 +87,7 @@ The calculator allows the user to select whether or not class penalties are in
 effect. Notably this selection also changes the method of how XP is split
 within a group which took place in the same patch (see below).
 
-## 3. XP per mob
-### 3. Hell levels
+## 5. Hell levels
 
 "Hell levels" cost progressively more XP. `H` is a multiplier (`>= 1.0`) applied
 to the XP **requirement** (item 1), not to per-kill gain:
@@ -152,36 +160,17 @@ comes from the fact that it is a hell level.
 | 59 | 89,334,600 | x3.0 | 61,613,700 |
 | 60 | 53,463,000 | x3.1 | 21,600,000 |
 
-### 4. XP per mob
 
-The base XP a single mob is worth, before group, con, or cap adjustments:
-
-```
-baseMobXp = mobLevel^2 * ZEM
-```
-
-## 4. ZEM (Zone Experience Modifier)
-### 5. ZEM (Zone Experience Modifier)
-
-`ZEM` is a per-zone multiplier where **75 = "normal"**. ZEM values have changed
-over time and most published sources should be considered unrelaible. This calculator
-uses the ZEM based on the P99 wiki, but individual ZEM values can be entered as well
-if a good source of truth is known.
-
-## 5. Hell levels
-ZEM values were intended to help balance the danger of various zones (typically
-dungeons).
-
-### 6. Number of mobs needed per level
+## 6. Number of mobs needed per level
 
 Most sites report the amount of XP needed to level, but the more interesting view
-is the number of mob kills needed to level. Excluding hell levels, this changes
-much more incrementally than is commonly understood.
+is the number of mob kills needed to level. This is commonly understand to increase
+exponentially, but excluding hell levels, this count changes relatively slowly and
+incrementally.
 
 ![Kills to reach the next level against a same-level white-con mob, solo, ZEM 75](kills-to-next-level.svg)
 
-## 6. Number of mobs needed per level
-### 7. Max XP
+## 7. Max XP
 
 The Max XP from a single mob has also changed over the course of the EQ timeline.
 This calculator uses a max
@@ -189,7 +178,7 @@ of 11% which is what is currently believed to be implemented on P99. This typica
 comes into play when low level characters being powerleveled kill a higher level mob.
 Excess XP above the cap is simply lost, not redistributed within a group. 
 
-### 8. Consider Modifier
+## 8. Consider Modifier
 
 The amount of XP per mob is modified by the mobs "consider" color. Similar to other 
 categories this has changed over time with "light blue" added in Luclin to 
@@ -303,7 +292,7 @@ Here's the table with the Modifier column added.
 | | +3 or more | Red | 1.0 | what would you like your tombstone to say? |
 
 
-### 9. Con range based on the highest character
+## 9. Con range based on the highest character
 
 When grouped, a mob's "consider" color (and its XP modifier) is computed against the
 **highest-level member of the group**, not each individual. 
@@ -311,7 +300,7 @@ When grouped, a mob's "consider" color (and its XP modifier) is computed against
 This is one of the two ways that lower level players can receive no experience when
 in a group. It is dependent only on the highest character level and the mob level.
 
-### 9. Max level split (group level spread)
+## 10. Max level split (group level spread)
 
 A group whose members span too wide a level range is penalized:
 members far below the top level can fall "out of range" and receive reduced or
@@ -336,8 +325,7 @@ Lowest Level * 1.5 (Round down) or Highest Level * 0.667 (Round up) and always a
 - Level 33 can group up to a 49 (33 * 1.5 = 49.5)
 - Level 50 can group down to a 34 (50 * 0.67 = 33.34)
 
-## 7. Group split
-### 7. Group Bonus
+## 11. Group Bonus
 
 To incentivize group, a **group-size bonus** multiplies the party's
 total XP for a kill. This was modified over the timeline, but the calcualtor
@@ -354,9 +342,8 @@ late Velious era.
 | 6 | 1.20 (+20%) |
 
 
-## 8. Con range based on the highest character
 
-### 10. Group Split
+## 12. Group Split
 There are two different methods to split XP, depending on whether or not class 
 penalties are in effect. At launch, XP was split between characters based on their
 experience, rather than their level. Because some race/class combos required
@@ -385,21 +372,6 @@ combos with penalties and a smaller share goes to class/race combos with bonuses
 If class penalties are not enabled, the split ignores both the class and race
 bonus/penalty, but race bonus/penalty will still come into play to determine kills
 to next level.
-
-The full table below is generated from the engine
-(`scripts/generate-consider-table.js`); each row is tinted with its consider
-color, and light/dark green collapse to a single green.
-
-![Consider color, message, and XP modifier by character level and mob-level difference](consider-colors.svg)
-
-## 9. Max level split (group level spread)
-
-In EverQuest, a group whose members span too wide a level range is penalized:
-members far below the top level can fall "out of range" and receive reduced or
-no XP, and the spread can shrink the overall group XP. **The calculator does not
-currently model this level-spread penalty** beyond the con-range effect in item
-8 (which keys off the highest member). Treat XP for very wide-spread groups as
-optimistic until this is modeled.
 
 ## References
 
