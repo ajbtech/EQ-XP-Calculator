@@ -44,6 +44,27 @@ test("neutralizes javascript: links", () => {
   );
 });
 
+test("renders images with src and alt", () => {
+  assert.equal(
+    renderMarkdown("![a chart](chart.svg)"),
+    '<p><img src="chart.svg" alt="a chart" /></p>',
+  );
+});
+
+test("does not turn an image into a link", () => {
+  assert.equal(
+    renderMarkdown("![alt](pic.png)"),
+    '<p><img src="pic.png" alt="alt" /></p>',
+  );
+});
+
+test("neutralizes javascript: image sources", () => {
+  assert.equal(
+    renderMarkdown("![x](javascript:alert)"),
+    '<p><img src="#" alt="x" /></p>',
+  );
+});
+
 test("escapes raw HTML in text", () => {
   assert.equal(
     renderMarkdown("a < b & c > d"),
