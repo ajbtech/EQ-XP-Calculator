@@ -8,6 +8,7 @@ const close = (a, b) => Math.abs(a - b) < 1e-9;
 
 const m = (race, className, level) => ({ race, className, level });
 const party = (...combos) => makeParty(combos, true);
+const partyOff = (...combos) => makeParty(combos, false);
 
 test("a single character gets the whole share", () => {
   const result = splitXp(party(m(RACES.HUMAN, CLASSES.CLERIC, 5)));
@@ -42,6 +43,56 @@ test("the combined modifier flows through the share", () => {
   );
   assert.ok(close(result[0].share, 1680 / 2680));
   assert.ok(close(result[1].share, 1000 / 2680));
+});
+
+test("a penalties-off party splits same-level members evenly regardless of race/class", () => {
+  // L2 Troll SK and L2 Human Cleric in a penalties-off party: both weighted by
+  // level only, so they split evenly.
+  const result = splitXp(
+    partyOff(
+      m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 2),
+      m(RACES.HUMAN, CLASSES.CLERIC, 2),
+    ),
+  );
+  assert.ok(close(result[0].share, 0.5));
+  assert.ok(close(result[1].share, 0.5));
+});
+
+test("a penalties-off party weights purely by level, ignoring the modifier", () => {
+  // Level-only XP: L2 -> 1000, L3 -> 8000, total 9000 (Troll SK's 1.68 ignored).
+  const result = splitXp(
+    partyOff(
+      m(RACES.HUMAN, CLASSES.CLERIC, 2),
+      m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 3),
+    ),
+  );
+  assert.ok(close(result[0].share, 1000 / 9000));
+  assert.ok(close(result[1].share, 8000 / 9000));
+});
+
+test("a penalties-on party keeps the modifier in the split", () => {
+  // Same inputs, penalties on: L2 Cleric xpSoFar 1000, L3 Troll SK xpSoFar
+  // 13440 (8000 * 1.68), total 14440.
+  const result = splitXp(
+    party(
+      m(RACES.HUMAN, CLASSES.CLERIC, 2),
+      m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 3),
+    ),
+  );
+  assert.ok(close(result[0].share, 1000 / 14440));
+  assert.ok(close(result[1].share, 13440 / 14440));
+});
+
+test("a penalties-off party still weights a level-1 character as a flat 1000", () => {
+  const result = splitXp(
+    partyOff(
+      m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 1),
+      m(RACES.HUMAN, CLASSES.CLERIC, 3),
+    ),
+  );
+  assert.ok(close(result[0].share, 1000 / 9000));
+  assert.ok(result[0].share > 0);
+  assert.ok(close(result[1].share, 8000 / 9000));
 });
 
 test("a level-1 character is weighted as 1000, not 0", () => {
