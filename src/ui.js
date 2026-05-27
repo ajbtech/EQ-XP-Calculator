@@ -28,17 +28,17 @@ const isFilled = (c) =>
 
 const state = {
   party: [
-    { race: "Barbarian", className: "Warrior", level: 42 },
-    { race: "High Elf", className: "Cleric", level: 41 },
-    { race: "Dark Elf", className: "Necromancer", level: 43 },
-    { race: "Ogre", className: "Shaman", level: 40 },
-    { race: "Wood Elf", className: "Ranger", level: 41 },
+    { race: "Troll", className: "Shadow Knight", level: 1 },
+    emptyMember(),
+    emptyMember(),
+    emptyMember(),
+    emptyMember(),
     emptyMember(),
   ],
   enc: {
-    mobLevel: 44,
+    mobLevel: 1,
     minutesPerKill: 6,
-    zoneName: "Lower Guk",
+    zoneName: "Innothule Swamp",
     useManualZem: false,
     manualZem: 75,
     penaltiesOn: false,
