@@ -65,7 +65,16 @@ xpToReachLevel(L) = totalXpToLevel(L) - totalXpToLevel(L - 1)
 
 ![XP required to reach the next level, levels 1–60, modifier 1.0](xp-to-next-level.svg)
 
-## 4. Race / class modifiers
+## 4. Number of mobs needed per level
+
+Most sites report the amount of XP needed to level, but the more interesting view
+is the number of mob kills needed to level. This is commonly understand to increase
+exponentially, but excluding hell levels, this count changes relatively slowly and
+incrementally.
+
+![Kills to reach the next level against a same-level white-con mob, solo, ZEM 75](kills-to-next-level.svg)
+
+## 5. Race / class modifiers
 
 These are XP-**to-level** multipliers: a penalty (`> 1`) means you need *more*
 XP to level; a bonus (`< 1`) means *less*. Race and class
@@ -105,7 +114,7 @@ The calculator allows the user to select whether or not class penalties are in
 effect. Notably this selection also changes the method of how XP is split
 within a group which took place in the same patch (see below).
 
-## 5. Hell levels
+## 6. Hell levels
 
 "Hell levels" cost progressively more XP. `H` is a multiplier (`>= 1.0`) applied
 to the XP **requirement** (item 1), not to per-kill gain:
@@ -178,15 +187,6 @@ comes from the fact that it is a hell level.
 | 59 | 89,334,600 | x3.0 | 61,613,700 |
 | 60 | 53,463,000 | x3.1 | 21,600,000 |
 
-
-## 6. Number of mobs needed per level
-
-Most sites report the amount of XP needed to level, but the more interesting view
-is the number of mob kills needed to level. This is commonly understand to increase
-exponentially, but excluding hell levels, this count changes relatively slowly and
-incrementally.
-
-![Kills to reach the next level against a same-level white-con mob, solo, ZEM 75](kills-to-next-level.svg)
 
 ## 7. Max XP
 
