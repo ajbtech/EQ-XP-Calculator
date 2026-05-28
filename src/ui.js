@@ -777,8 +777,7 @@ function build() {
 
   app.appendChild(
     el("div", { class: "banner" }, [
-      el("strong", {}, "Estimates only. "),
-      "Both equations and ZEM have changed over time and accurate sources are sparse. Please see the README at the bottom of the page for more detail.",
+      "Please enter race/class/level for your group members, as well as the level of the mobs you are hunting, your kill rate and your zone.",
     ]),
   );
 
