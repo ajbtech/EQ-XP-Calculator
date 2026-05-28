@@ -6,6 +6,8 @@ Over the course of its life, Everquest has changed modifiers, hell levels, ZEM a
 
 This calculator optimizes for the Project 1999 server, but should generally be applicable to TLPs during the classic era. Treat all results as approximate. Feel free to provide feedback and corrections to Gorrek at ajbtechinfo@gmail.com
 
+EverQuest and the world map artwork are property of Daybreak Game Company. This is an unofficial fan project with no affiliation to Daybreak or the Project 1999 team.
+
 ## 1. XP per mob
 
 The base XP a single mob is worth, before group, con, or cap adjustments:
