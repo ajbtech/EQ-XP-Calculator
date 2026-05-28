@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { classModifier } from "../src/class.js";
 import { CLASSES } from "../src/enums.js";
 
-// CLASSIC-EQ class XP modifier. P99 REMOVED class penalties (see CLAUDE.md/
-// PLAN.md) — this helper is reference/classic only.
+// CLASSIC-EQ class XP modifier. P99 REMOVED class penalties (see CLAUDE.md)
+// — this helper is reference/classic only.
 //
 // The returned value is an XP-TO-LEVEL multiplier: a penalty means the
 // character needs MORE xp (>1); a bonus means LESS xp (<1).
