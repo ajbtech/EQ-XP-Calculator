@@ -664,7 +664,7 @@ const EXPLAIN = [
   ],
   [
     "Group Bonus",
-    "bonus(size)",
+    "Up to 20%",
     "A group-size bonus multiplies the party's total XP per kill (P99's late-Velious values): 2 = +2%, 3 = +6%, 4 = +10%, 5 = +14%, 6 = +20%. Inactive members don't count toward size.",
   ],
   [
