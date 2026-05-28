@@ -1,10 +1,18 @@
 {
   "name": "eq-xp-calculator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "An honest P99 EverQuest XP calculator (static web app).",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ajbtech/eq-xp-calculator.git"
+  },
+  "homepage": "https://ajbtech.github.io/eq-xp-calculator/",
+  "bugs": {
+    "url": "https://github.com/ajbtech/eq-xp-calculator/issues"
+  },
   "scripts": {
     "test": "node --test",
     "lint": "eslint .",
