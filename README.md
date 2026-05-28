@@ -17,7 +17,7 @@ baseMobXp = mobLevel^2 * ZEM
 ## 2. ZEM (Zone Experience Modifier)
 
 `ZEM` is a per-zone multiplier where **75 = "normal"**. ZEM values have changed
-over time and most published sources should be considered unrelaible. This calculator
+over time and most published sources should be considered unreliable. This calculator
 uses the ZEM based on the P99 wiki, but individual ZEM values can be entered as well
 if a good source of truth is known.
 
@@ -65,14 +65,14 @@ multipliers are **multiplied together**, not added (e.g. a Troll SK = 1.2 race
 | Halfling | 0.95 (+5%) |
 | all others | 1.00 |
 
-**Class modifiers — removed on P99.** During the earliest eras, specifc classes 
-had further penalties to help balance the face that some classes would otherwise
+**Class modifiers — removed on P99.** During the earliest eras, specific classes 
+had further penalties to help balance the fact that some classes would otherwise
 level faster than others. Due to improved balancing, these modifiers were later
 removed (Jan 14, 2001 Patch - Velious Era). 
 
 P99 removed class XP penalties (Blue/Red
 since 2015-09-21, Green since 2021-08-10), so on P99 `C = 1.0`. The historical
-classic-EQ values 
+classic-EQ values were:
 
 | Class | Modifier |
 |---|---|
@@ -195,9 +195,7 @@ has multiple conflicting sources, but the following table is used as source of t
 "Consider" level ranges with only one green text result in a 0 modifier. Those with two
 result in 0 and 0.5. Those with three result in 0, 0.25, 0.5.
 
-Here's a markdown table summarizing the consider (con) color data. The "Level Diff" is the mob's level relative to yours.
-
-Here's the table with the Modifier column added.
+In the table below, "Level Diff" is the mob's level relative to yours.
 
 | Char Level | Level Diff | Color | Modifier | Message |
 |---|---|---|---|---|
@@ -304,9 +302,9 @@ in a group. It is dependent only on the highest character level and the mob leve
 
 A group whose members span too wide a level range is penalized:
 members far below the top level can fall "out of range" and receive reduced or
-no XP. *
+no XP.
 
-This is the second way that lower level playesr can receive no experience when 
+This is the second way that lower level players can receive no experience when 
 in a group. It is dependent only on the highest character level and each 
 individual player level.
 
@@ -327,8 +325,8 @@ Lowest Level * 1.5 (Round down) or Highest Level * 0.667 (Round up) and always a
 
 ## 11. Group Bonus
 
-To incentivize group, a **group-size bonus** multiplies the party's
-total XP for a kill. This was modified over the timeline, but the calcualtor
+To incentivize grouping, a **group-size bonus** multiplies the party's
+total XP for a kill. This was modified over the timeline, but the calculator
 reflects the currently implemented bonus on P99 which was implemented during the
 late Velious era.
 
@@ -353,7 +351,7 @@ players in the same group would level at the same rate, but effectively be penal
 characters without XP penalties.
 
 When class penalties were removed, the split was adjusted to be "based on level", but
-the specific way that this was implemented in unclear. As a result, it is assumed
+the specific way that this was implemented is unclear. As a result, it is assumed
 that the method matches the previous implementation, but removes both race and class 
 bonuses when splitting XP in a group. The result would be a split exclusively "based
 on level", but still broadly proportional to the previous method when grouping with 
@@ -362,7 +360,7 @@ different level characters.
 It is further unknown if either of these splits were based on XP at start of current 
 level, cumulative XP
 (including progress in this level), or cumulative XP to next level. Because the 
-first two methods break down for new charcters (0 XP at start of level and 0 
+first two methods break down for new characters (0 XP at start of level and 0 
 cumulative XP, resulting in no XP for these characters), it is assumed that the 
 third method is used. As a result, the calculator does the split based on cumulative 
 XP to next level. 
