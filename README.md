@@ -14,6 +14,24 @@ The base XP a single mob is worth, before group, con, or cap adjustments:
 baseMobXp = mobLevel^2 * ZEM
 ```
 
+**Examples** (ZEM values from the community snapshot in `data/zems.json`):
+
+- *A Froglok* — a level 3 mob in **Innothule Swamp** (ZEM 100):
+
+  ```
+  baseMobXp = 3^2 * 100 = 900
+  ```
+
+- *Lord Bob* — a level 65 mob in **Velk's Labyrinth** (Velketor's Labyrinth,
+  ZEM 94):
+
+  ```
+  baseMobXp = 65^2 * 94 = 397,150
+  ```
+
+These are the base values before the group bonus, consider modifier, and 11%
+per-mob cap are applied (see sections below).
+
 ## 2. ZEM (Zone Experience Modifier)
 
 `ZEM` is a per-zone multiplier where **75 = "normal"**. ZEM values have changed
