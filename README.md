@@ -105,7 +105,7 @@ multipliers are **multiplied together**, not added (e.g. a Troll SK = 1.2 race
 | Halfling | 0.95 (+5%) |
 | all others | 1.00 |
 
-**Class modifiers — removed on P99.** During the earliest eras, specific classes 
+**Class modifiers.** During the earliest eras, specific classes 
 had further penalties to help balance the fact that some classes would otherwise
 level faster than others. Due to improved balancing, these modifiers were later
 removed (Jan 14, 2001 Patch - Velious Era). 
