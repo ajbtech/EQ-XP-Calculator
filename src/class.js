@@ -1,7 +1,7 @@
 // Pure CLASSIC-EQ class XP modifier — no DOM, importable by the browser and
 // node:test.
 //
-// IMPORTANT: P99 REMOVED class XP penalties (see CLAUDE.md / PLAN.md): only
+// IMPORTANT: P99 REMOVED class XP penalties (see CLAUDE.md): only
 // race modifiers still affect XP there. This helper encodes the historical
 // classic-EQ class penalties/bonuses for reference/comparison only and must NOT
 // be applied to the P99 XP result unless penalties are explicitly toggled on.

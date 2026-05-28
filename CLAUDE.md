@@ -20,8 +20,8 @@ P99 facts the calculator must respect:
 - **Hell levels** apply a `hell_mod` multiplier.
 - **Group bonus** by party size plus a **group XP share** formula.
 
-See `PLAN.md` for the full data model, formula pseudocode, open questions, and
-v1 scope.
+See `architecture.md` for the module layout and how a calculation flows through
+the engine.
 
 ## High-level architecture
 
@@ -89,4 +89,4 @@ Tests live in `test/` and run against the pure modules in `src/`. CI runs
 - HTML + vanilla JS (ES modules), zero build step.
 - Static JSON data lives in `data/`; keep it editable without code changes.
 - Honesty first: estimated values are labelled "(est.)" and results are
-  described as approximate (see PLAN.md).
+  described as approximate.

@@ -5,7 +5,7 @@
 //   mobXp = mobLevel^2 * zem
 //
 // where zem (C) is the zone's ZEM. P99 ZEMs are custom community estimates
-// (see CLAUDE.md / PLAN.md), so the caller is responsible for sourcing zem.
+// (see CLAUDE.md), so the caller is responsible for sourcing zem.
 
 import { assertIntInRange, assertPositiveFinite } from "./validate.js";
 
