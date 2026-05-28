@@ -653,42 +653,42 @@ const ZEM_RANGE_FORMULA = Symbol("zem-range");
 
 const EXPLAIN = [
   [
-    "Base mob XP",
+    "Base Mob XP",
     "mobLevel² × ZEM",
     "Each kill's base scales with the square of the mob's level and the zone's ZEM (75 = normal).",
   ],
   [
-    "Zone modifier (ZEM)",
+    "Zone Modifier (ZEM)",
     ZEM_RANGE_FORMULA,
     "ZEM is intended to provide greater rewards for riskier zones like dungeons. P99 ZEMs are custom and unpublished. These are community best-guesses from the wiki — not official numbers. Treat them as approximate.",
   ],
   [
-    "Group bonus",
+    "Group Bonus",
     "bonus(size)",
     "A group-size bonus multiplies the party's total XP per kill (P99's late-Velious values): 2 = +2%, 3 = +6%, 4 = +10%, 5 = +14%, 6 = +20%. Inactive members don't count toward size.",
   ],
   [
-    "Group split",
+    "Group Split",
     "share by level",
     "The party's XP splits across active members by their cumulative XP to next level. With class penalties off, the split is purely level-based (race/class modifiers removed); with them on, penalized combos take a larger share.",
   ],
   [
-    "XP to next level",
+    "XP to Next Level",
     "lvl³ × race × class × hell × 1000",
     "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
   ],
   [
-    "Con modifier",
+    "Con Modifier",
     "by con color",
     "A mob's “consider” color scales its XP: red/yellow/white/blue give full XP (×1.0), while green cons are trivial and award reduced or no XP (×0, 0.25, or 0.5). In a group the con is computed against the highest-level member, not each player.",
   ],
   [
-    "Group level range",
+    "Group Level Range",
     "low×1.5 / high×0.667",
     "A group can only span so wide a level gap before low members fall out of range and earn no XP. The range is the lowest level ×1.5 (round down) or the highest level ×0.667 (round up), and always at least 5 levels. E.g. a 20 can group up to a 30; a 30 can group down to a 20.",
   ],
   [
-    "Race / class modifiers",
+    "Race / Class Modifiers",
     "×0.86 (Halfling Warrior) – ×1.68 (Troll SK)",
     "Intended to balance the fact that some races and classes were more powerful than others. Class modifiers were turned off in the Velious timeline.",
   ],
