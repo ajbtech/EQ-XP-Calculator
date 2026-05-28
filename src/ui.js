@@ -660,7 +660,7 @@ const EXPLAIN = [
   [
     "Zone modifier (ZEM)",
     ZEM_RANGE_FORMULA,
-    "P99 ZEMs are custom and unpublished. These are community best-guesses from the wiki — not official numbers. Treat them as approximate.",
+    "ZEM is intended to provide greater rewards for riskier zones like dungeons. P99 ZEMs are custom and unpublished. These are community best-guesses from the wiki — not official numbers. Treat them as approximate.",
   ],
   [
     "Group bonus",
