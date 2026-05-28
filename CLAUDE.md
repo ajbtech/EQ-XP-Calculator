@@ -31,26 +31,35 @@ network calls beyond loading local JSON.
 
 ```
 EQ-XP-Calculator/
-  index.html              # the single page
+  index.html              # the single page; loads src/ui.js as a module
   styles.css              # mobile-first styles
   src/
-    xp.js                 # PURE formula module (no DOM) — the contract
-    ui.js                 # reads the form, calls xp.js, renders results
-    data.js               # loads + validates JSON from data/
-  data/                   # community tables: zems, races, hellmod, groups, meta
-  test/
-    xp.test.js            # node:test golden-value tests for src/xp.js
-  .github/workflows/
-    test.yml              # node --test on push/PR
+    xp.js                 # PUBLIC API BARREL — re-exports the pure engine
+    ui.js                 # the only DOM layer; reads the form, renders results
+    data.js               # loads data/zems.json + pure shapers
+    <factor modules>      # enums, validate, race, class, hell, group,
+                          #   eligibility, consider, mob, level
+    <pipeline modules>    # character, party, partyxp, split, award, kills
+    format.js, markdown.js # pure UI display helpers
+  data/zems.json          # community ZEM snapshot (estimates + disclaimer)
+  test/                   # one node:test golden-value file per src module
+  scripts/                # offline generators (charts, consider table)
+  .github/workflows/      # test.yml (lint+format+test), deploy.yml (Pages)
 ```
 
+See `architecture.md` for the full module breakdown and the calculation
+pipeline (`makeParty` → `killsToNextLevel` → `awardXp` → `partyXpForMob`/`splitXp`).
+
 Key boundaries:
-- **`src/xp.js`** holds all the math as pure functions with no DOM access, so
-  it is importable unchanged by both the browser and the test runner.
-- **`src/ui.js`** is the only DOM layer; it reads the form, calls `xp.js`, and
-  renders results.
-- **`data/`** holds static JSON tables, editable without touching code as the
-  community revises ZEMs and other estimates.
+- **`src/xp.js`** is the public API barrel: consumers import from here, not from
+  individual modules. The math itself lives in small single-purpose modules
+  behind it.
+- **Everything in `src/` is pure (no DOM) except `src/ui.js`**, so the engine is
+  importable unchanged by both the browser and the test runner.
+- **`src/ui.js`** is the only DOM layer; it reads the form, calls the engine via
+  `xp.js`, and renders results.
+- **`data/zems.json`** is a static community snapshot, editable without touching
+  code as the community revises ZEMs.
 
 ## Test-Driven Development (required)
 
@@ -64,13 +73,13 @@ the red-green-refactor cycle:
 
 Rules:
 - No production code without a failing test that requires it.
-- The XP formula in `src/xp.js` is the contract: every multiplier, the 11%
+- The pure engine behind `src/xp.js` is the contract: every multiplier, the 11%
   per-mob cap, hell-level mods, group bonus/share, and race modifiers must be
   covered by **golden-value tests** with hard-coded expected numbers.
 - When fixing a bug, first write a test that reproduces it (and fails), then
   fix it.
-- Keep `src/xp.js` pure (no DOM) so it stays importable by both the browser
-  and the test runner.
+- Keep the `src/` engine pure (no DOM) so it stays importable by both the
+  browser and the test runner; only `src/ui.js` touches the DOM.
 
 ## Running tests
 
