@@ -673,9 +673,9 @@ const EXPLAIN = [
     "The party's XP splits across party members by their cumulative XP to next level. With class penalties off, the split is purely level-based (race/class modifiers removed); with them on, penalized races and classes take a larger share.",
   ],
   [
-    "XP to Next Level",
+    "Cumulative XP to next level",
     "lvl³ × race × class × hell × 1000",
-    "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
+    "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. XP to next level is determined by f(L) - f(L-1).",
   ],
   [
     "Con Modifier",
