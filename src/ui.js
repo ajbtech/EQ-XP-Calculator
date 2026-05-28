@@ -679,7 +679,7 @@ const EXPLAIN = [
   ],
   [
     "Con Modifier",
-    "by con color",
+    "Varies from 0% to 100%",
     "A mob's “consider” color scales its XP: red/yellow/white/blue give full XP (×1.0), while green cons are trivial and award reduced or no XP (×0, 0.25, or 0.5). In a group the con is computed against the highest-level member, not each player.",
   ],
   [
