@@ -14,19 +14,18 @@ The base XP a single mob is worth, before group, con, or cap adjustments:
 baseMobXp = mobLevel^2 * ZEM
 ```
 
-**Examples** (ZEM values from the community snapshot in `data/zems.json`):
+**Examples** (the ZEM is filled in once the zone is known — see section 2):
 
-- *A Froglok* — a level 3 mob in **Innothule Swamp** (ZEM 100):
-
-  ```
-  baseMobXp = 3^2 * 100 = 900
-  ```
-
-- *Lord Bob* — a level 65 mob in **Velk's Labyrinth** (Velketor's Labyrinth,
-  ZEM 94):
+- *A Froglok* — a level 3 mob in **Innothule Swamp**:
 
   ```
-  baseMobXp = 65^2 * 94 = 397,150
+  baseMobXp = 3^2 * ZEM
+  ```
+
+- *Lord Bob* — a level 65 mob in **Velk's Labyrinth** (Velketor's Labyrinth):
+
+  ```
+  baseMobXp = 65^2 * ZEM
   ```
 
 These are the base values before the group bonus, consider modifier, and 11%
@@ -41,6 +40,20 @@ if a good source of truth is known.
 
 ZEM values were intended to help balance the danger of various zones (typically
 dungeons).
+
+**Examples** (ZEM values from the community snapshot in `data/zems.json`):
+
+- *A Froglok* in **Innothule Swamp** (ZEM 100):
+
+  ```
+  baseMobXp = 3^2 * 100 = 900
+  ```
+
+- *Lord Bob* in **Velk's Labyrinth** (Velketor's Labyrinth, ZEM 94):
+
+  ```
+  baseMobXp = 65^2 * 94 = 397,150
+  ```
 
 ## 3. XP per level
 
@@ -96,10 +109,6 @@ multipliers are **multiplied together**, not added (e.g. a Troll SK = 1.2 race
 had further penalties to help balance the fact that some classes would otherwise
 level faster than others. Due to improved balancing, these modifiers were later
 removed (Jan 14, 2001 Patch - Velious Era). 
-
-P99 removed class XP penalties (Blue/Red
-since 2015-09-21, Green since 2021-08-10), so on P99 `C = 1.0`. The historical
-classic-EQ values were:
 
 | Class | Modifier |
 |---|---|
