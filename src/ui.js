@@ -653,42 +653,42 @@ const ZEM_RANGE_FORMULA = Symbol("zem-range");
 
 const EXPLAIN = [
   [
-    "Base mob XP",
+    "Base Mob XP",
     "mobLevel² × ZEM",
     "Each kill's base scales with the square of the mob's level and the zone's ZEM (75 = normal).",
   ],
   [
-    "Zone modifier (ZEM)",
+    "Zone Modifier (ZEM)",
     ZEM_RANGE_FORMULA,
-    "P99 ZEMs are custom and unpublished. These are community best-guesses from the wiki — not official numbers. Treat them as approximate.",
+    "ZEM is intended to provide greater rewards for riskier zones like dungeons. P99 ZEMs are custom and unpublished. These are community best-guesses from the wiki — not official numbers. Treat them as approximate.",
   ],
   [
-    "Group bonus",
-    "bonus(size)",
+    "Group Bonus",
+    "Up to 20%",
     "A group-size bonus multiplies the party's total XP per kill (P99's late-Velious values): 2 = +2%, 3 = +6%, 4 = +10%, 5 = +14%, 6 = +20%. Inactive members don't count toward size.",
   ],
   [
-    "Group split",
-    "share by level",
-    "The party's XP splits across active members by their cumulative XP to next level. With class penalties off, the split is purely level-based (race/class modifiers removed); with them on, penalized combos take a larger share.",
+    "Group Split",
+    "Split by proportion of cumulative XP",
+    "The party's XP splits across party members by their cumulative XP to next level. With class penalties off, the split is purely level-based (race/class modifiers removed); with them on, penalized races and classes take a larger share.",
   ],
   [
-    "XP to next level",
+    "Cumulative XP to next level",
     "lvl³ × race × class × hell × 1000",
-    "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. Per-level totals are unverified estimates.",
+    "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. XP to next level is determined by f(L) - f(L-1).",
   ],
   [
-    "Con modifier",
-    "by con color",
+    "Con Modifier",
+    "Varies from 0% to 100%",
     "A mob's “consider” color scales its XP: red/yellow/white/blue give full XP (×1.0), while green cons are trivial and award reduced or no XP (×0, 0.25, or 0.5). In a group the con is computed against the highest-level member, not each player.",
   ],
   [
-    "Group level range",
+    "Group Level Range",
     "low×1.5 / high×0.667",
     "A group can only span so wide a level gap before low members fall out of range and earn no XP. The range is the lowest level ×1.5 (round down) or the highest level ×0.667 (round up), and always at least 5 levels. E.g. a 20 can group up to a 30; a 30 can group down to a 20.",
   ],
   [
-    "Race / class modifiers",
+    "Race / Class Modifiers",
     "×0.86 (Halfling Warrior) – ×1.68 (Troll SK)",
     "Intended to balance the fact that some races and classes were more powerful than others. Class modifiers were turned off in the Velious timeline.",
   ],
@@ -712,7 +712,7 @@ function buildExplainer() {
     );
   }
   const howDetails = el("details", { open: "" }, [
-    summary("How experience works on P99"),
+    summary("How experience works in Everquest"),
     grid,
   ]);
 
