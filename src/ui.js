@@ -712,7 +712,7 @@ function buildExplainer() {
     );
   }
   const howDetails = el("details", { open: "" }, [
-    summary("How experience works on P99"),
+    summary("How experience works in Everquest"),
     grid,
   ]);
 
