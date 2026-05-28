@@ -675,7 +675,7 @@ const EXPLAIN = [
   [
     "Cumulative XP to next level",
     "lvl³ × race × class × hell × 1000",
-    "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. XP to next level is determined by f(L) - f(L-1).",
+    "Each level costs roughly the cube of its number. Hell levels (30, 35, 40, 45, 51–60) cost more via a multiplier. XP to next level is determined by f(L) - f(L-1). Because of this equation and mob XP growing with the square of level, required kills per level grows much more slowly.",
   ],
   [
     "Con Modifier",
