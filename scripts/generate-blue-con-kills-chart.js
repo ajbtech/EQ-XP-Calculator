@@ -111,12 +111,8 @@ function lowestBlueMobLevel(charLevel) {
 const data = [];
 for (let level = 1; level <= MAX_LEVEL; level++) {
   const step = hellStep(level);
-  const mobLevel = lowestBlueMobLevel(level);
-  if (mobLevel === null) {
-    // Level 1: no blue cons exist. Plot zero so the bar is absent.
-    data.push({ level, step, value: 0, mobLevel: null });
-    continue;
-  }
+  // Fall back to the white-con same-level mob when no blue con exists (level 1).
+  const mobLevel = lowestBlueMobLevel(level) ?? level;
   const party = makeParty(
     [{ race: "Human", className: "Cleric", level }],
     true,
@@ -131,7 +127,7 @@ writeFileSync(
   barChart({
     title: "EverQuest P99 — Kills to Next Level vs Lowest Blue-Con Mob",
     subtitle:
-      "solo, no race/class modifier, ZEM 75 — mob is the lowest level that still cons Blue to the character",
+      "solo, no race/class modifier, ZEM 75 — lowest blue-con mob per level (L1 uses white-con, no blue available)",
     yLabel: "Kills to next level",
     data,
     fmtY: String,
