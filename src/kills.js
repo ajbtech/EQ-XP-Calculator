@@ -15,6 +15,8 @@ import { awardXp } from "./award.js";
  * @property {number} remaining   XP still needed to reach the next level
  * @property {number} kills       kills needed (Infinity if xpPerKill is 0)
  * @property {boolean} capApplied true if the 11% per-mob cap clamped xpPerKill
+ * @property {boolean} eligible   false when the character is too far below the
+ *   group's highest level to receive any XP
  */
 
 /**
@@ -50,6 +52,7 @@ export function killsToNextLevel(party, mobLevel, zem) {
       remaining,
       kills,
       capApplied: a.capApplied,
+      eligible: a.eligible,
     });
   });
 

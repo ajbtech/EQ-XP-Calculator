@@ -26,6 +26,8 @@ import { groupXpEligibility } from "./eligibility.js";
  * @typedef {Object} Allocation
  * @property {object} character  the character this share belongs to
  * @property {number} share      fraction of the XP pool (0-1); shares sum to 1
+ * @property {boolean} eligible  false when the character is too far below the
+ *   group's highest level to receive any XP (groupXpEligibility check)
  */
 
 /**
@@ -46,15 +48,20 @@ export function splitXp(party) {
   }
   const { characters, penaltiesInEffect, maxLevel } = party;
 
-  const weights = characters.map((c) => {
-    if (!groupXpEligibility(c.level, maxLevel)) return 0;
+  const eligible = characters.map((c) => groupXpEligibility(c.level, maxLevel));
+  const weights = characters.map((c, i) => {
+    if (!eligible[i]) return 0;
     return penaltiesInEffect ? c.xpToNextLevel : totalXpToLevel(c.level, 1);
   });
   const total = weights.reduce((sum, w) => sum + w, 0);
 
   return Object.freeze(
     characters.map((c, i) =>
-      Object.freeze({ character: c, share: weights[i] / total }),
+      Object.freeze({
+        character: c,
+        share: weights[i] / total,
+        eligible: eligible[i],
+      }),
     ),
   );
 }
