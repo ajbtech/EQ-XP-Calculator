@@ -89,6 +89,12 @@ incrementally.
 
 ![Kills to reach the next level against a same-level white-con mob, solo, ZEM 75](kills-to-next-level.svg)
 
+The chart below shows the same kill count, but using the **lowest-level mob that still cons blue** to the character at each level. The number above each bar is the mob level used. Because blue-con mobs give full XP (modifier 1.0) yet require fewer kills than a same-level white-con mob, this represents the most efficient mob choice available at each level.
+
+The spike at levels 2–4 occurs because at those levels the only blue-con mob available is level 1 — there are no lower-level mobs to fill the blue range. Level 1 mobs award very little XP (their base XP scales as `mobLevel² × ZEM = 1 × ZEM`), so an enormous number of kills is required. By level 5 the blue threshold has risen enough that mob level 2 becomes available, and kill counts drop sharply. Level 1 itself has no blue cons at all, so it uses a white-con mob instead and is noted accordingly.
+
+![Kills to next level against the lowest blue-con mob per level, solo, ZEM 75](kills-to-next-level-blue-con.svg)
+
 ## 5. Race / class modifiers
 
 These are XP-**to-level** multipliers: a penalty (`> 1`) means you need *more*
