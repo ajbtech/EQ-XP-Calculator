@@ -10,13 +10,18 @@ const m = (race, className, level) => ({ race, className, level });
 const party = (...combos) => makeParty(combos, true);
 const partyOff = (...combos) => makeParty(combos, false);
 
+// All weights below assume the cubic XP curve totalXpToLevel(L) = L^3 * 1000
+// (no hell modifier in 1-29). Reference values used throughout:
+//   L1=1000   L2=8000   L3=27000   L4=64000   L5=125000
+// Troll SK modifier = 1.20 (race) * 1.40 (class) = 1.68.
+
 test("a single character gets the whole share", () => {
   const result = splitXp(party(m(RACES.HUMAN, CLASSES.CLERIC, 5)));
   assert.equal(result.length, 1);
   assert.equal(result[0].share, 1);
 });
 
-test("equal xpSoFar splits evenly", () => {
+test("equal level + modifier splits evenly", () => {
   const result = splitXp(
     party(m(RACES.HUMAN, CLASSES.CLERIC, 5), m(RACES.HUMAN, CLASSES.CLERIC, 5)),
   );
@@ -24,30 +29,30 @@ test("equal xpSoFar splits evenly", () => {
   assert.ok(close(result[1].share, 0.5));
 });
 
-test("share is proportional to xpSoFar", () => {
-  // L2 Cleric xpSoFar = 1000, L3 Cleric xpSoFar = 8000, total 9000.
+test("share is proportional to cumulative XP to next level", () => {
+  // L2 Cleric xpToNextLevel = 8000, L3 Cleric xpToNextLevel = 27000, total 35000.
   const result = splitXp(
     party(m(RACES.HUMAN, CLASSES.CLERIC, 2), m(RACES.HUMAN, CLASSES.CLERIC, 3)),
   );
-  assert.ok(close(result[0].share, 1000 / 9000));
-  assert.ok(close(result[1].share, 8000 / 9000));
+  assert.ok(close(result[0].share, 8000 / 35000));
+  assert.ok(close(result[1].share, 27000 / 35000));
 });
 
-test("the combined modifier flows through the share", () => {
-  // L2 Troll SK xpSoFar = 1680, L2 Human Cleric xpSoFar = 1000, total 2680.
+test("the combined modifier flows through the share when penalties are on", () => {
+  // L2 Troll SK xpToNextLevel = 8000 * 1.68 = 13440, L2 Human Cleric = 8000.
+  // Total 21440.
   const result = splitXp(
     party(
       m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 2),
       m(RACES.HUMAN, CLASSES.CLERIC, 2),
     ),
   );
-  assert.ok(close(result[0].share, 1680 / 2680));
-  assert.ok(close(result[1].share, 1000 / 2680));
+  assert.ok(close(result[0].share, 13440 / 21440));
+  assert.ok(close(result[1].share, 8000 / 21440));
 });
 
 test("a penalties-off party splits same-level members evenly regardless of race/class", () => {
-  // L2 Troll SK and L2 Human Cleric in a penalties-off party: both weighted by
-  // level only, so they split evenly.
+  // Modifier-less curve: both L2 = 8000, so split evenly even with a Troll SK.
   const result = splitXp(
     partyOff(
       m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 2),
@@ -59,62 +64,52 @@ test("a penalties-off party splits same-level members evenly regardless of race/
 });
 
 test("a penalties-off party weights purely by level, ignoring the modifier", () => {
-  // Level-only XP: L2 -> 1000, L3 -> 8000, total 9000 (Troll SK's 1.68 ignored).
+  // Modifier-less: L2 -> 8000, L3 -> 27000, total 35000 (Troll SK's 1.68 ignored).
   const result = splitXp(
     partyOff(
       m(RACES.HUMAN, CLASSES.CLERIC, 2),
       m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 3),
     ),
   );
-  assert.ok(close(result[0].share, 1000 / 9000));
-  assert.ok(close(result[1].share, 8000 / 9000));
+  assert.ok(close(result[0].share, 8000 / 35000));
+  assert.ok(close(result[1].share, 27000 / 35000));
 });
 
 test("a penalties-on party keeps the modifier in the split", () => {
-  // Same inputs, penalties on: L2 Cleric xpSoFar 1000, L3 Troll SK xpSoFar
-  // 13440 (8000 * 1.68), total 14440.
+  // L2 Cleric xpToNextLevel 8000, L3 Troll SK xpToNextLevel 27000 * 1.68 = 45360,
+  // total 53360.
   const result = splitXp(
     party(
       m(RACES.HUMAN, CLASSES.CLERIC, 2),
       m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 3),
     ),
   );
-  assert.ok(close(result[0].share, 1000 / 14440));
-  assert.ok(close(result[1].share, 13440 / 14440));
+  assert.ok(close(result[0].share, 8000 / 53360));
+  assert.ok(close(result[1].share, 45360 / 53360));
 });
 
-test("a penalties-off party still weights a level-1 character as a flat 1000", () => {
-  const result = splitXp(
-    partyOff(
-      m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 1),
-      m(RACES.HUMAN, CLASSES.CLERIC, 3),
-    ),
-  );
-  assert.ok(close(result[0].share, 1000 / 9000));
-  assert.ok(result[0].share > 0);
-  assert.ok(close(result[1].share, 8000 / 9000));
-});
-
-test("a level-1 character is weighted as 1000, not 0", () => {
-  // L1 weight 1000, L3 Cleric xpSoFar 8000, total 9000 -> L1 still gets a share.
+test("a level-1 member receives a non-zero share via the L1 cumulative XP", () => {
+  // L1 xpToNextLevel = 1000, L3 Cleric xpToNextLevel = 27000, total 28000.
   const result = splitXp(
     party(m(RACES.HUMAN, CLASSES.CLERIC, 1), m(RACES.HUMAN, CLASSES.CLERIC, 3)),
   );
-  assert.ok(close(result[0].share, 1000 / 9000));
+  assert.ok(close(result[0].share, 1000 / 28000));
   assert.ok(result[0].share > 0);
-  assert.ok(close(result[1].share, 8000 / 9000));
+  assert.ok(close(result[1].share, 27000 / 28000));
 });
 
-test("the level-1 weight is a flat 1000, ignoring the modifier", () => {
-  // Both level 1, so both weighted 1000 despite the Troll SK's 1.68 modifier.
+test("a L1+L2 pair splits proportionally to L^3 (1000 vs 8000)", () => {
+  // Regression: previously L1 was hard-coded to a flat 1000 weight, which equals
+  // the L2 cumulative (1000), so an L1+L2 party would split evenly. With the new
+  // logic (weight by xpToNextLevel), L1=1000 and L2=8000, total 9000.
   const result = splitXp(
-    party(
-      m(RACES.TROLL, CLASSES.SHADOW_KNIGHT, 1),
+    partyOff(
       m(RACES.HUMAN, CLASSES.CLERIC, 1),
+      m(RACES.HUMAN, CLASSES.CLERIC, 2),
     ),
   );
-  assert.ok(close(result[0].share, 0.5));
-  assert.ok(close(result[1].share, 0.5));
+  assert.ok(close(result[0].share, 1000 / 9000));
+  assert.ok(close(result[1].share, 8000 / 9000));
 });
 
 test("a member too far below the group's max level earns nothing", () => {
@@ -131,8 +126,7 @@ test("a member too far below the group's max level earns nothing", () => {
 });
 
 test("an ineligible member is zeroed even with penalties on", () => {
-  // The level-1 baseline weight does not rescue an ineligible member: L1 cap is
-  // 6, the group max is 8, so the L1 still gets nothing.
+  // L1 cap is 6, the group max is 8, so the L1 still gets nothing.
   const result = splitXp(
     party(m(RACES.HUMAN, CLASSES.CLERIC, 1), m(RACES.HUMAN, CLASSES.CLERIC, 8)),
   );

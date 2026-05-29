@@ -36,11 +36,11 @@ test("per-character XP sums back to the party total", () => {
   assert.ok(close(sum, result.total));
 });
 
-test("XP is split proportionally to xpSoFar", () => {
-  // L2 xpSoFar 1000, L3 xpSoFar 8000 -> shares 1/9 and 8/9.
+test("XP is split proportionally to cumulative XP to next level", () => {
+  // L2 xpToNextLevel 8000, L3 xpToNextLevel 27000 -> shares 8/35 and 27/35.
   const result = awardXp(party(m(2), m(3)), 3, 75);
-  assert.ok(close(result.awards[0].xp, result.total * (1000 / 9000)));
-  assert.ok(close(result.awards[1].xp, result.total * (8000 / 9000)));
+  assert.ok(close(result.awards[0].xp, result.total * (8000 / 35000)));
+  assert.ok(close(result.awards[1].xp, result.total * (27000 / 35000)));
 });
 
 test("caps a single kill at 11% of the player's current level", () => {
