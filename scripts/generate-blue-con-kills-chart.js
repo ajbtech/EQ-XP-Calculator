@@ -117,7 +117,8 @@ for (let level = 1; level <= MAX_LEVEL; level++) {
     [{ race: "Human", className: "Cleric", level }],
     true,
   );
-  const kills = killsToNextLevel(party, mobLevel, BASELINE_ZEM).players[0].kills;
+  const kills = killsToNextLevel(party, mobLevel, BASELINE_ZEM).players[0]
+    .kills;
   data.push({ level, step, value: kills, mobLevel });
 }
 
@@ -133,12 +134,3 @@ writeFileSync(
     fmtY: String,
   }),
 );
-
-console.log("Wrote kills-to-next-level-blue-con.svg");
-// Log the mob level used at each character level for verification.
-console.log("\nChar level → lowest blue mob level:");
-for (const d of data) {
-  if (d.level % 5 === 0 || d.level <= 5) {
-    console.log(`  L${String(d.level).padStart(2)}: mob ${d.mobLevel ?? "none"} → ${d.value} kills`);
-  }
-}
