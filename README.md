@@ -6,6 +6,8 @@ Over the course of its life, Everquest has changed modifiers, hell levels, ZEM a
 
 This calculator optimizes for the Project 1999 server, but should generally be applicable to TLPs during the classic era. Treat all results as approximate. Feel free to provide feedback and corrections to Gorrek at ajbtechinfo@gmail.com
 
+EverQuest and the world map artwork are property of Daybreak Game Company. This is an unofficial fan project with no affiliation to Daybreak or the Project 1999 team.
+
 ## 1. XP per mob
 
 The base XP a single mob is worth, before group, con, or cap adjustments:
@@ -13,6 +15,23 @@ The base XP a single mob is worth, before group, con, or cap adjustments:
 ```
 baseMobXp = mobLevel^2 * ZEM
 ```
+
+**Examples** (the ZEM is filled in once the zone is known — see section 2):
+
+- *A Froglok* — a level 3 mob in **Innothule Swamp**:
+
+  ```
+  baseMobXp = 3^2 * ZEM
+  ```
+
+- *Lord Bob* — a level 65 mob in **Velk's Labyrinth** (Velketor's Labyrinth):
+
+  ```
+  baseMobXp = 65^2 * ZEM
+  ```
+
+These are the base values before the group bonus, consider modifier, and 11%
+per-mob cap are applied (see sections below).
 
 ## 2. ZEM (Zone Experience Modifier)
 
@@ -23,6 +42,20 @@ if a good source of truth is known.
 
 ZEM values were intended to help balance the danger of various zones (typically
 dungeons).
+
+**Examples** (ZEM values from the community snapshot in `data/zems.json`):
+
+- *A Froglok* in **Innothule Swamp** (ZEM 100):
+
+  ```
+  baseMobXp = 3^2 * 100 = 900
+  ```
+
+- *Lord Bob* in **Velk's Labyrinth** (Velketor's Labyrinth, ZEM 94):
+
+  ```
+  baseMobXp = 65^2 * 94 = 397,150
+  ```
 
 ## 3. XP per level
 
@@ -47,7 +80,16 @@ xpToReachLevel(L) = totalXpToLevel(L) - totalXpToLevel(L - 1)
 
 ![XP required to reach the next level, levels 1–60, modifier 1.0](xp-to-next-level.svg)
 
-## 4. Race / class modifiers
+## 4. Number of mobs needed per level
+
+Most sites report the amount of XP needed to level, but the more interesting view
+is the number of mob kills needed to level. This is commonly understand to increase
+exponentially, but excluding hell levels, this count changes relatively slowly and
+incrementally.
+
+![Kills to reach the next level against a same-level white-con mob, solo, ZEM 75](kills-to-next-level.svg)
+
+## 5. Race / class modifiers
 
 These are XP-**to-level** multipliers: a penalty (`> 1`) means you need *more*
 XP to level; a bonus (`< 1`) means *less*. Race and class
@@ -65,14 +107,10 @@ multipliers are **multiplied together**, not added (e.g. a Troll SK = 1.2 race
 | Halfling | 0.95 (+5%) |
 | all others | 1.00 |
 
-**Class modifiers — removed on P99.** During the earliest eras, specific classes 
+**Class modifiers.** During the earliest eras, specific classes 
 had further penalties to help balance the fact that some classes would otherwise
 level faster than others. Due to improved balancing, these modifiers were later
 removed (Jan 14, 2001 Patch - Velious Era). 
-
-P99 removed class XP penalties (Blue/Red
-since 2015-09-21, Green since 2021-08-10), so on P99 `C = 1.0`. The historical
-classic-EQ values were:
 
 | Class | Modifier |
 |---|---|
@@ -87,7 +125,7 @@ The calculator allows the user to select whether or not class penalties are in
 effect. Notably this selection also changes the method of how XP is split
 within a group which took place in the same patch (see below).
 
-## 5. Hell levels
+## 6. Hell levels
 
 "Hell levels" cost progressively more XP. `H` is a multiplier (`>= 1.0`) applied
 to the XP **requirement** (item 1), not to per-kill gain:
@@ -160,15 +198,6 @@ comes from the fact that it is a hell level.
 | 59 | 89,334,600 | x3.0 | 61,613,700 |
 | 60 | 53,463,000 | x3.1 | 21,600,000 |
 
-
-## 6. Number of mobs needed per level
-
-Most sites report the amount of XP needed to level, but the more interesting view
-is the number of mob kills needed to level. This is commonly understand to increase
-exponentially, but excluding hell levels, this count changes relatively slowly and
-incrementally.
-
-![Kills to reach the next level against a same-level white-con mob, solo, ZEM 75](kills-to-next-level.svg)
 
 ## 7. Max XP
 
