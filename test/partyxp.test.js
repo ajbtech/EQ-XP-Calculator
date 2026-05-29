@@ -18,10 +18,16 @@ test("solo, even con: base is mobLevel^2 * zem", () => {
   assert.ok(close(partyXpForMob(party, 30, 75), 67500));
 });
 
-test("applies the group bonus for party size", () => {
-  const party = makeParty([member(30), member(30), member(30)], true);
-  // 67500 * groupBonus(3)=1.06
+test("applies the modern group bonus for party size (penalties off)", () => {
+  const party = makeParty([member(30), member(30), member(30)], false);
+  // 67500 * groupBonus(3, false)=1.06
   assert.ok(close(partyXpForMob(party, 30, 75), 67500 * 1.06));
+});
+
+test("applies the classic group bonus when penalties are on", () => {
+  const party = makeParty([member(30), member(30), member(30)], true);
+  // 67500 * groupBonus(3, true)=1.04 (+2% per extra member, classic era)
+  assert.ok(close(partyXpForMob(party, 30, 75), 67500 * 1.04));
 });
 
 test("zem scales the result linearly", () => {

@@ -198,13 +198,14 @@ function refresh() {
     refs.enc.con.className = "con-readout";
   }
 
-  // Group bonus cells.
+  // Group bonus cells — text and active highlight track the era toggle.
   refs.bonusCells.forEach((cell, idx) => {
     const n = idx + 1;
+    cell.textContent = "×" + groupBonus(n, state.enc.penaltiesOn).toFixed(2);
     cell.classList.toggle("on", n <= activeN && activeN >= 1);
   });
   refs.enc.bonusNote.textContent = activeN
-    ? `${activeN} active → ×${groupBonus(Math.min(activeN, 6)).toFixed(2)} multiplier`
+    ? `${activeN} active → ×${groupBonus(Math.min(activeN, 6), state.enc.penaltiesOn).toFixed(2)} multiplier`
     : "no active members";
 
   // Constants — base XP at the normal ZEM (75), the selected ZEM, then after
@@ -222,7 +223,7 @@ function refresh() {
     : "—";
   refs.constants.size.textContent = String(activeN);
   refs.constants.bonus.textContent = activeN
-    ? "×" + groupBonus(Math.min(activeN, 6)).toFixed(2)
+    ? "×" + groupBonus(Math.min(activeN, 6), state.enc.penaltiesOn).toFixed(2)
     : "—";
   refs.constants.party.textContent = result ? fmtNum(result.total) : "—";
 }
@@ -620,11 +621,8 @@ function radio(checked, label, trailing, onClick) {
 function buildGroupBonus() {
   const cells = el("div", { class: "bonus-cells" });
   for (let n = 1; n <= 6; n++) {
-    const cell = el(
-      "div",
-      { class: "bonus-cell" },
-      "×" + groupBonus(n).toFixed(2),
-    );
+    // Text is set in refresh() so it tracks the era (penaltiesOn) toggle.
+    const cell = el("div", { class: "bonus-cell" });
     refs.bonusCells.push(cell);
     cells.appendChild(cell);
   }

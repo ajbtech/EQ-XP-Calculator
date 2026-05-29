@@ -364,9 +364,12 @@ Lowest Level * 1.5 (Round down) or Highest Level * 0.667 (Round up) and always a
 ## 11. Group Bonus
 
 To incentivize grouping, a **group-size bonus** multiplies the party's
-total XP for a kill. This was modified over the timeline, but the calculator
-reflects the currently implemented bonus on P99 which was implemented during the
-late Velious era.
+total XP for a kill. The bonus changed in the same Jan 14, 2001 patch that
+removed class penalties and changed the group split method (see sections 5
+and 12), so the calculator selects between two tables based on the class
+penalties toggle.
+
+**Modern (class penalties OFF — current P99 implementation, post-Velious patch):**
 
 | Size | Bonus |
 |---|---|
@@ -376,6 +379,19 @@ late Velious era.
 | 4 | 1.10 (+10%) |
 | 5 | 1.14 (+14%) |
 | 6 | 1.20 (+20%) |
+
+**Classic (class penalties ON — pre-patch era):** the bonus is an additional
+2% experience per group member, not counting the first one, leading to a
+maximum bonus of 10%.
+
+| Size | Bonus |
+|---|---|
+| 1 | 1.00 |
+| 2 | 1.02 (+2%) |
+| 3 | 1.04 (+4%) |
+| 4 | 1.06 (+6%) |
+| 5 | 1.08 (+8%) |
+| 6 | 1.10 (+10%) |
 
 
 
