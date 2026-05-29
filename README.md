@@ -21,13 +21,13 @@ baseMobXp = mobLevel^2 * ZEM
 - *A Froglok* — a level 3 mob in **Innothule Swamp**:
 
   ```
-  baseMobXp = 3^2 * ZEM
+  baseMobXp = 3^2 * ZEM = 9 * ZEM
   ```
 
 - *Lord Bob* — a level 65 mob in **Velk's Labyrinth** (Velketor's Labyrinth):
 
   ```
-  baseMobXp = 65^2 * ZEM
+  baseMobXp = 65^2 * ZEM = 4,225 * ZEM
   ```
 
 These are the base values before the group bonus, consider modifier, and 11%
