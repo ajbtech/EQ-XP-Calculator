@@ -21,6 +21,8 @@ const PER_MOB_CAP = 0.11;
  * @property {number} share      proportional share of the party total (0-1)
  * @property {number} xp         XP this character receives for the kill (capped)
  * @property {boolean} capApplied  true if the 11% per-mob cap clamped this slice
+ * @property {boolean} eligible    false when the character is too far below the
+ *   group's highest level to receive any XP
  */
 
 /**
@@ -54,6 +56,7 @@ export function awardXp(party, mobLevel, zem) {
           share: a.share,
           xp: capApplied ? cap : uncapped,
           capApplied,
+          eligible: a.eligible,
         });
       }),
     ),
