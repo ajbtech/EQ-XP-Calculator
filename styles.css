@@ -181,8 +181,8 @@ a {
   display: grid;
   grid-template-columns:
     26px minmax(96px, 1fr) minmax(96px, 1fr)
-    52px 56px 76px 64px 86px 86px;
-  min-width: 638px;
+    52px 56px 76px 64px 96px 96px 86px 86px;
+  min-width: 800px;
 }
 .cell {
   padding: 6px 8px;
@@ -199,7 +199,7 @@ a {
 .cell.c-act {
   justify-content: center;
 }
-.sheet-grid > .cell:nth-child(9n) {
+.sheet-grid > .cell:nth-child(11n) {
   border-right: none;
 }
 .cell.row-head {
