@@ -604,7 +604,14 @@ function buildEncounter() {
     },
   );
   const toggle = el("div", { class: "toggle-row" }, [
-    el("span", { class: "enc-label" }, "class XP penalties"),
+    el("span", { class: "enc-label" }, [
+      "class XP penalties ",
+      el(
+        "span",
+        { class: "zem-rel", style: "margin:0" },
+        "(Jan 14, 2001 patch)",
+      ),
+    ]),
     penCb,
   ]);
   card.appendChild(toggle);
