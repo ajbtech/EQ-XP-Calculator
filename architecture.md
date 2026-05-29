@@ -112,6 +112,12 @@ Supporting pure helpers:
   em-dash for non-finite values).
 - **`markdown.js`** — a small dependency-free Markdown→HTML renderer (escapes
   HTML and sanitizes URLs) used to render the README in-page.
+- **`persist.js`** — pure `serialize` / `deserialize` of the UI state plus a
+  `defaultState()` factory and a versioned `STORAGE_KEY`. The DOM layer reads
+  the last snapshot from `localStorage` on start and writes a fresh one after
+  every refresh, so a returning user sees the same party they left. Validation
+  drops any non-canonical race/class or out-of-range number, so a stale or
+  hand-edited blob can't poison the engine.
 
 ## Testing & CI
 
