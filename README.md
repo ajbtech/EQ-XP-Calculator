@@ -76,7 +76,11 @@ The XP for a *single* level is the difference between two cumulative totals:
 xpToReachLevel(L) = totalXpToLevel(L) - totalXpToLevel(L - 1)
 ```
 
+The cumulative XP curve is dominated by hell-level multipliers at high levels. The jump at level 59 (triple hell) is especially dramatic — reaching level 60 requires more total XP than the entire journey from level 1 to 58 combined.
+
 ![Cumulative XP to achieve each level, levels 1–60, modifier 1.0](xp-per-level.svg)
+
+Between hell levels, each individual level costs only a modest amount more than the last — XP requirements rise smoothly with the cubic curve. Hell levels break that pattern abruptly: level 30 costs roughly 70% more than level 29, and the steps grow steeper through the 50s. The bar color indicates how much the hell multiplier changed at that level.
 
 ![XP required to reach the next level, levels 1–60, modifier 1.0](xp-to-next-level.svg)
 
