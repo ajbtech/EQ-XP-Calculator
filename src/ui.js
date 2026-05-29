@@ -162,16 +162,20 @@ function refresh() {
     r.sh.textContent = share.toFixed(0) + "%";
 
     r.gk.textContent = "+" + fmtNum(player.xpPerKill) + " XP";
-    if (player.capApplied) {
+    const notices = [];
+    if (player.capApplied)
+      notices.push("* 11% per-mob cap applied — excess XP is lost");
+    if (!player.eligible)
+      notices.push(
+        "* Character is too far below the highest party member to receive XP",
+      );
+    if (player.xpPerKill === 0 && player.eligible)
+      notices.push(
+        "* Mob cons green to the highest party member — no XP awarded",
+      );
+    if (notices.length) {
       r.gk.appendChild(el("span", { class: "cap-flag" }, " *"));
-      r.gk.title = "11% per-mob cap applied — excess XP is lost";
-    } else if (!player.eligible) {
-      r.gk.appendChild(el("span", { class: "cap-flag" }, " †"));
-      r.gk.title =
-        "Character is too far below the highest party member to receive XP";
-    } else if (player.xpPerKill === 0) {
-      r.gk.appendChild(el("span", { class: "cap-flag" }, " ‡"));
-      r.gk.title = "Mob cons green to the highest party member — no XP awarded";
+      r.gk.title = notices.join("\n");
     } else {
       r.gk.title = "";
     }
@@ -187,12 +191,9 @@ function refresh() {
     if (Number.isFinite(player.kills)) {
       r.kl.textContent = fmtNum(player.kills);
       r.tm.textContent = fmtMins(player.kills * state.enc.minutesPerKill);
-    } else if (!player.eligible) {
-      r.kl.textContent = "—†";
-      r.tm.textContent = "—†";
     } else {
-      r.kl.textContent = "—‡";
-      r.tm.textContent = "—‡";
+      r.kl.textContent = "— *";
+      r.tm.textContent = "— *";
     }
   });
 
