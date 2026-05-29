@@ -69,7 +69,7 @@ function barChart({ title, subtitle, yLabel, data, fmtY }) {
   // Tooltip annotations: mob level label on bars at level 5, 10, … 60
   let annotations = "";
   for (const d of data) {
-    if (d.mobLevel != null && (d.level % 10 === 0 || d.level === 5)) {
+    if (d.mobLevel != null && (d.level % 5 === 0 || d.level === 1)) {
       const bx = m.left + d.level * slot - slot + slot / 2;
       const by = y(d.value);
       annotations += `<text x="${bx.toFixed(1)}" y="${(by - 4).toFixed(1)}" text-anchor="middle" font-size="9" fill="#777">mob ${d.mobLevel}</text>`;
