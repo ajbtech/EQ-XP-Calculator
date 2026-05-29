@@ -134,6 +134,8 @@ function refresh() {
       r.sh.textContent = dash;
       r.gk.textContent = dash;
       r.gp.textContent = dash;
+      r.xr.textContent = dash;
+      r.xc.textContent = dash;
       r.kl.textContent = dash;
       r.tm.textContent = dash;
       r.gk.title = "";
@@ -155,6 +157,9 @@ function refresh() {
       player.remaining > 0
         ? ((player.xpPerKill / player.remaining) * 100).toFixed(2) + "%"
         : dash;
+
+    r.xr.textContent = fmtNum(player.remaining) + " XP";
+    r.xc.textContent = fmtNum(player.character.xpToNextLevel) + " XP";
 
     r.kl.textContent = Number.isFinite(player.kills)
       ? fmtNum(player.kills)
@@ -319,6 +324,8 @@ const COLS = [
   { id: "sh", label: "split", cls: "c-sh num" },
   { id: "gk", label: "XP / kill", cls: "c-gk num gain" },
   { id: "gp", label: "gain %", cls: "c-gp num soft" },
+  { id: "xr", label: "XP to lvl", cls: "c-xr num soft" },
+  { id: "xc", label: "XP cumul.", cls: "c-xc num soft" },
   { id: "kl", label: "kills → lvl", cls: "c-kl num accent" },
   { id: "tm", label: "time → lvl", cls: "c-tm num accent" },
 ];
@@ -391,15 +398,19 @@ function buildSheet() {
     const sh = el("span", { class: "soft" });
     const gk = el("span", { class: "gain" });
     const gp = el("span", { class: "soft" });
+    const xr = el("span", { class: "soft" });
+    const xc = el("span", { class: "soft" });
     const kl = el("span", { class: "accent" });
     const tm = el("span", { class: "accent" });
     cells.sh = sh;
     cells.gk = gk;
     cells.gp = gp;
+    cells.xr = xr;
+    cells.xc = xc;
     cells.kl = kl;
     cells.tm = tm;
 
-    const contents = [clear, race, klass, level, sh, gk, gp, kl, tm];
+    const contents = [clear, race, klass, level, sh, gk, gp, xr, xc, kl, tm];
     const rowCells = COLS.map((col, j) =>
       el("div", { class: `cell ${col.cls}` }, contents[j]),
     );
