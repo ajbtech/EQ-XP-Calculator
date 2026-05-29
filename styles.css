@@ -181,7 +181,7 @@ a {
   display: grid;
   grid-template-columns:
     26px minmax(96px, 1fr) minmax(96px, 1fr)
-    52px 56px 76px 64px 96px 96px 86px 86px;
+    repeat(8, 76px);
   min-width: 800px;
 }
 .cell {
