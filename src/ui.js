@@ -18,6 +18,12 @@ import {
 import { fmtNum, fmtMins } from "./format.js";
 import { loadZems, continentGroups, zemForZone, zemRange } from "./data.js";
 import { renderMarkdown } from "./markdown.js";
+import {
+  STORAGE_KEY,
+  defaultState,
+  serialize,
+  deserialize,
+} from "./persist.js";
 
 const MAX_LEVEL = 60;
 const MAX_MOB_LEVEL = 70;
@@ -28,24 +34,34 @@ const emptyMember = () => ({ race: "", className: "", level: null });
 const isFilled = (c) =>
   Boolean(c.race) && Boolean(c.className) && Number.isFinite(c.level);
 
-const state = {
-  party: [
-    { race: "Troll", className: "Shadow Knight", level: 1 },
-    emptyMember(),
-    emptyMember(),
-    emptyMember(),
-    emptyMember(),
-    emptyMember(),
-  ],
-  enc: {
-    mobLevel: 1,
-    minutesPerKill: 6,
-    zoneName: "Innothule Swamp",
-    useManualZem: false,
-    manualZem: 75,
-    penaltiesOn: false,
-  },
-};
+const state = defaultState();
+
+// Pull the last-saved snapshot in before the DOM is built so the form
+// renders pre-filled. Invalid or stale snapshots fall back to defaults
+// inside deserialize(), so a corrupted blob can't break the page.
+function loadFromStorage() {
+  let raw = null;
+  try {
+    const text = localStorage.getItem(STORAGE_KEY);
+    if (text) raw = JSON.parse(text);
+  } catch {
+    // localStorage may be disabled (private mode) or the value unparseable —
+    // either way, fall through to defaults.
+    return;
+  }
+  const loaded = deserialize(raw);
+  state.party.length = 0;
+  state.party.push(...loaded.party);
+  Object.assign(state.enc, loaded.enc);
+}
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(serialize(state)));
+  } catch {
+    // Quota exceeded or storage disabled — persistence is best-effort.
+  }
+}
 
 // ── tiny DOM helper ──────────────────────────────────────
 function el(tag, props = {}, children = []) {
@@ -226,6 +242,8 @@ function refresh() {
     ? "×" + groupBonus(Math.min(activeN, 6), state.enc.penaltiesOn).toFixed(2)
     : "—";
   refs.constants.party.textContent = result ? fmtNum(result.total) : "—";
+
+  saveToStorage();
 }
 
 // ── builders ─────────────────────────────────────────────
@@ -586,7 +604,14 @@ function buildEncounter() {
     },
   );
   const toggle = el("div", { class: "toggle-row" }, [
-    el("span", { class: "enc-label" }, "class XP penalties"),
+    el("span", { class: "enc-label" }, [
+      "class XP penalties ",
+      el(
+        "span",
+        { class: "zem-rel", style: "margin:0" },
+        "(Jan 14, 2001 patch)",
+      ),
+    ]),
     penCb,
   ]);
   card.appendChild(toggle);
@@ -822,5 +847,6 @@ function build() {
     console.error(err);
     return;
   }
+  loadFromStorage();
   build();
 })();
