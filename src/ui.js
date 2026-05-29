@@ -325,7 +325,7 @@ const COLS = [
   { id: "gk", label: "XP / kill", cls: "c-gk num gain" },
   { id: "gp", label: "gain %", cls: "c-gp num soft" },
   { id: "xr", label: "XP to lvl", cls: "c-xr num soft" },
-  { id: "xc", label: "XP cumul.", cls: "c-xc num soft" },
+  { id: "xc", label: "XP cumul. to lvl", cls: "c-xc num soft" },
   { id: "kl", label: "kills → lvl", cls: "c-kl num accent" },
   { id: "tm", label: "time → lvl", cls: "c-tm num accent" },
 ];
