@@ -1,8 +1,8 @@
 // Pure module — no DOM, importable by the browser and node:test.
 //
 // Total XP a party receives for one kill:
-//   base    = mobXp(mobLevel, zem)                    (mobLevel^2 * zem)
-//   grouped = base * groupBonus(party.size)           (group size bonus)
+//   base    = mobXp(mobLevel, zem)                                     (mobLevel^2 * zem)
+//   grouped = base * groupBonus(party.size, party.penaltiesInEffect)   (era-aware group size bonus)
 //   total   = grouped * consider(maxLevel, mobLevel)  (con modifier of the
 //                                                      highest-level member)
 //
@@ -33,7 +33,7 @@ export function partyXpForMob(party, mobLevel, zem) {
   }
 
   const base = mobXp(mobLevel, zem);
-  const grouped = base * groupBonus(party.size);
+  const grouped = base * groupBonus(party.size, party.penaltiesInEffect);
   const { xpModifier } = consider(party.maxLevel, mobLevel);
   return grouped * xpModifier;
 }
