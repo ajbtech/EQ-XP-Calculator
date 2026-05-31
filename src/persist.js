@@ -60,6 +60,10 @@ export function serialize(state) {
   };
 }
 
+// A finite number, or undefined if the value isn't one.
+const finiteOr = (v) =>
+  typeof v === "number" && Number.isFinite(v) ? v : undefined;
+
 function sanitizeMember(raw) {
   const m = emptyMember();
   if (!raw || typeof raw !== "object") return m;
@@ -67,11 +71,44 @@ function sanitizeMember(raw) {
   if (typeof raw.className === "string" && isClass(raw.className)) {
     m.className = raw.className;
   }
-  if (typeof raw.level === "number" && Number.isFinite(raw.level)) {
-    const lv = Math.round(raw.level);
+  const level = finiteOr(raw.level);
+  if (level !== undefined) {
+    const lv = Math.round(level);
     if (lv >= MIN_LEVEL && lv <= MAX_LEVEL) m.level = lv;
   }
   return m;
+}
+
+// Overlay any valid encounter fields from `renc` onto the default `enc`,
+// clamping numbers to their accepted ranges and ignoring wrong-typed values.
+function sanitizeEnc(enc, renc) {
+  if (!renc || typeof renc !== "object") return;
+
+  const mobLevel = finiteOr(renc.mobLevel);
+  if (mobLevel !== undefined) {
+    enc.mobLevel = clamp(Math.round(mobLevel), MIN_MOB_LEVEL, MAX_MOB_LEVEL);
+  }
+  const minutes = finiteOr(renc.minutesPerKill);
+  if (minutes !== undefined) {
+    enc.minutesPerKill = clamp(
+      minutes,
+      MIN_MINUTES_PER_KILL,
+      MAX_MINUTES_PER_KILL,
+    );
+  }
+  const manualZem = finiteOr(renc.manualZem);
+  if (manualZem !== undefined) {
+    enc.manualZem = clamp(Math.round(manualZem), MIN_ZEM, MAX_ZEM);
+  }
+  if (typeof renc.zoneName === "string" && renc.zoneName.length > 0) {
+    enc.zoneName = renc.zoneName;
+  }
+  if (typeof renc.useManualZem === "boolean") {
+    enc.useManualZem = renc.useManualZem;
+  }
+  if (typeof renc.penaltiesOn === "boolean") {
+    enc.penaltiesOn = renc.penaltiesOn;
+  }
 }
 
 export function deserialize(raw) {
@@ -79,45 +116,11 @@ export function deserialize(raw) {
   if (!raw || typeof raw !== "object") return out;
 
   if (Array.isArray(raw.party)) {
-    const party = [];
-    for (let i = 0; i < PARTY_SIZE; i++) {
-      party.push(sanitizeMember(raw.party[i]));
-    }
-    out.party = party;
+    out.party = Array.from({ length: PARTY_SIZE }, (_, i) =>
+      sanitizeMember(raw.party[i]),
+    );
   }
-
-  const renc = raw.enc;
-  if (renc && typeof renc === "object") {
-    if (typeof renc.mobLevel === "number" && Number.isFinite(renc.mobLevel)) {
-      out.enc.mobLevel = clamp(
-        Math.round(renc.mobLevel),
-        MIN_MOB_LEVEL,
-        MAX_MOB_LEVEL,
-      );
-    }
-    if (
-      typeof renc.minutesPerKill === "number" &&
-      Number.isFinite(renc.minutesPerKill)
-    ) {
-      out.enc.minutesPerKill = clamp(
-        renc.minutesPerKill,
-        MIN_MINUTES_PER_KILL,
-        MAX_MINUTES_PER_KILL,
-      );
-    }
-    if (typeof renc.zoneName === "string" && renc.zoneName.length > 0) {
-      out.enc.zoneName = renc.zoneName;
-    }
-    if (typeof renc.useManualZem === "boolean") {
-      out.enc.useManualZem = renc.useManualZem;
-    }
-    if (typeof renc.manualZem === "number" && Number.isFinite(renc.manualZem)) {
-      out.enc.manualZem = clamp(Math.round(renc.manualZem), MIN_ZEM, MAX_ZEM);
-    }
-    if (typeof renc.penaltiesOn === "boolean") {
-      out.enc.penaltiesOn = renc.penaltiesOn;
-    }
-  }
+  sanitizeEnc(out.enc, raw.enc);
 
   return out;
 }
