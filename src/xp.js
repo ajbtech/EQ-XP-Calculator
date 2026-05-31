@@ -28,3 +28,4 @@ export { partyXpForMob } from "./partyxp.js";
 export { splitXp } from "./split.js";
 export { awardXp } from "./award.js";
 export { killsToNextLevel } from "./kills.js";
+export { parseLine, isChat } from "./logparser.js";
