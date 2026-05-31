@@ -24,13 +24,21 @@ import {
   serialize,
   deserialize,
 } from "./persist.js";
-
-const MAX_LEVEL = 60;
-const MAX_MOB_LEVEL = 70;
+import {
+  MIN_LEVEL,
+  MAX_LEVEL,
+  MIN_MOB_LEVEL,
+  MAX_MOB_LEVEL,
+  MIN_ZEM,
+  MAX_ZEM,
+  MIN_MINUTES_PER_KILL,
+  MAX_MINUTES_PER_KILL,
+  clamp,
+  emptyMember,
+} from "./constants.js";
 
 // A row counts toward the party only when fully filled in. Clearing a row
 // (the ✕ button) blanks these fields, leaving an empty slot to refill.
-const emptyMember = () => ({ race: "", className: "", level: null });
 const isFilled = (c) =>
   Boolean(c.race) && Boolean(c.className) && Number.isFinite(c.level);
 
@@ -82,8 +90,6 @@ function el(tag, props = {}, children = []) {
   }
   return node;
 }
-
-const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
 // Refs to nodes that refresh() updates, filled during build.
 const refs = {
@@ -412,7 +418,7 @@ function buildSheet() {
         refresh();
         return;
       }
-      const v = clamp(Math.round(+level.value || 1), 1, MAX_LEVEL);
+      const v = clamp(Math.round(+level.value || 1), MIN_LEVEL, MAX_LEVEL);
       c.level = v;
       if (String(v) !== level.value) level.value = String(v);
       refresh();
@@ -496,7 +502,7 @@ function buildEncounter() {
     "aria-label": "mob level",
   });
   mob.addEventListener("input", () => {
-    const v = clamp(Math.round(+mob.value || 1), 1, MAX_MOB_LEVEL);
+    const v = clamp(Math.round(+mob.value || 1), MIN_MOB_LEVEL, MAX_MOB_LEVEL);
     state.enc.mobLevel = v;
     if (String(v) !== mob.value) mob.value = String(v);
     refresh();
@@ -511,14 +517,18 @@ function buildEncounter() {
   const mins = el("input", {
     type: "number",
     step: "0.1",
-    min: "0.1",
-    max: "60",
+    min: String(MIN_MINUTES_PER_KILL),
+    max: String(MAX_MINUTES_PER_KILL),
     value: String(state.enc.minutesPerKill),
     class: "big-input",
     "aria-label": "minutes per kill",
   });
   mins.addEventListener("input", () => {
-    const v = clamp(+mins.value || 0.1, 0.1, 60);
+    const v = clamp(
+      +mins.value || MIN_MINUTES_PER_KILL,
+      MIN_MINUTES_PER_KILL,
+      MAX_MINUTES_PER_KILL,
+    );
     state.enc.minutesPerKill = v;
     refresh();
   });
@@ -574,14 +584,14 @@ function buildEncounter() {
   );
   const customInput = el("input", {
     type: "number",
-    min: "1",
-    max: "500",
+    min: String(MIN_ZEM),
+    max: String(MAX_ZEM),
     value: String(state.enc.manualZem),
     class: "zem-custom",
     "aria-label": "custom ZEM",
   });
   customInput.addEventListener("input", () => {
-    const v = clamp(Math.round(+customInput.value || 1), 1, 500);
+    const v = clamp(Math.round(+customInput.value || 1), MIN_ZEM, MAX_ZEM);
     state.enc.manualZem = v;
     state.enc.useManualZem = true;
     if (String(v) !== customInput.value) customInput.value = String(v);

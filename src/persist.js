@@ -5,14 +5,21 @@
 // actual localStorage I/O.
 
 import { isRace, isClass } from "./enums.js";
+import {
+  MIN_LEVEL,
+  MAX_LEVEL,
+  MIN_MOB_LEVEL,
+  MAX_MOB_LEVEL,
+  PARTY_SIZE,
+  MIN_ZEM,
+  MAX_ZEM,
+  MIN_MINUTES_PER_KILL,
+  MAX_MINUTES_PER_KILL,
+  clamp,
+  emptyMember,
+} from "./constants.js";
 
 export const STORAGE_KEY = "eq-xp-calculator/v1";
-
-const MAX_LEVEL = 60;
-const MAX_MOB_LEVEL = 70;
-const PARTY_SIZE = 6;
-
-const emptyMember = () => ({ race: "", className: "", level: null });
 
 export function defaultState() {
   return {
@@ -53,10 +60,6 @@ export function serialize(state) {
   };
 }
 
-function clamp(n, lo, hi) {
-  return Math.max(lo, Math.min(hi, n));
-}
-
 function sanitizeMember(raw) {
   const m = emptyMember();
   if (!raw || typeof raw !== "object") return m;
@@ -66,7 +69,7 @@ function sanitizeMember(raw) {
   }
   if (typeof raw.level === "number" && Number.isFinite(raw.level)) {
     const lv = Math.round(raw.level);
-    if (lv >= 1 && lv <= MAX_LEVEL) m.level = lv;
+    if (lv >= MIN_LEVEL && lv <= MAX_LEVEL) m.level = lv;
   }
   return m;
 }
@@ -86,13 +89,21 @@ export function deserialize(raw) {
   const renc = raw.enc;
   if (renc && typeof renc === "object") {
     if (typeof renc.mobLevel === "number" && Number.isFinite(renc.mobLevel)) {
-      out.enc.mobLevel = clamp(Math.round(renc.mobLevel), 1, MAX_MOB_LEVEL);
+      out.enc.mobLevel = clamp(
+        Math.round(renc.mobLevel),
+        MIN_MOB_LEVEL,
+        MAX_MOB_LEVEL,
+      );
     }
     if (
       typeof renc.minutesPerKill === "number" &&
       Number.isFinite(renc.minutesPerKill)
     ) {
-      out.enc.minutesPerKill = clamp(renc.minutesPerKill, 0.1, 60);
+      out.enc.minutesPerKill = clamp(
+        renc.minutesPerKill,
+        MIN_MINUTES_PER_KILL,
+        MAX_MINUTES_PER_KILL,
+      );
     }
     if (typeof renc.zoneName === "string" && renc.zoneName.length > 0) {
       out.enc.zoneName = renc.zoneName;
@@ -101,7 +112,7 @@ export function deserialize(raw) {
       out.enc.useManualZem = renc.useManualZem;
     }
     if (typeof renc.manualZem === "number" && Number.isFinite(renc.manualZem)) {
-      out.enc.manualZem = clamp(Math.round(renc.manualZem), 1, 500);
+      out.enc.manualZem = clamp(Math.round(renc.manualZem), MIN_ZEM, MAX_ZEM);
     }
     if (typeof renc.penaltiesOn === "boolean") {
       out.enc.penaltiesOn = renc.penaltiesOn;
