@@ -1,4 +1,4 @@
-// Pure, dependency-free Markdown -> HTML renderer â no DOM, importable by the
+// Pure, dependency-free Markdown -> HTML renderer — no DOM, importable by the
 // browser and node:test. It supports only the subset of Markdown the project's
 // README uses: ATX headings, paragraphs (soft-wrapped lines joined), unordered
 // lists, fenced code blocks, GitHub-style tables, and the inline spans bold,
