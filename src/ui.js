@@ -833,7 +833,7 @@ function build() {
 
   app.appendChild(
     el("header", { class: "app-header" }, [
-      el("span", { class: "app-title" }, "EQ XP Calculator"),
+      el("span", { class: "app-title" }, "Gorrek's EQ XP Calculator"),
       el(
         "span",
         { class: "app-tagline" },
