@@ -20,7 +20,9 @@ export function rowNotices(player) {
     );
   }
   if (player.xpPerKill === 0 && player.eligible) {
-    notices.push("* Mob cons green to the highest party member — no XP awarded");
+    notices.push(
+      "* Mob cons green to the highest party member — no XP awarded",
+    );
   }
   return notices;
 }
