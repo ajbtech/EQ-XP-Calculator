@@ -1,4 +1,4 @@
-// Pure, dependency-free Markdown -> HTML renderer â no DOM, importable by the
+// Pure, dependency-free Markdown -> HTML renderer — no DOM, importable by the
 // browser and node:test. It supports only the subset of Markdown the project's
 // README uses: ATX headings, paragraphs (soft-wrapped lines joined), unordered
 // lists, fenced code blocks, GitHub-style tables, and the inline spans bold,
@@ -30,7 +30,7 @@ function renderInline(text) {
   const tokens = [];
   const stash = (html) => {
     tokens.push(html);
-    return `\uF8FF${tokens.length - 1}\uF8FF`;
+    return `${tokens.length - 1}`;
   };
 
   let out = text.replace(/`([^`]+)`/g, (_, code) =>
@@ -49,7 +49,7 @@ function renderInline(text) {
   out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   out = out.replace(/\*([^*]+)\*/g, "<em>$1</em>");
 
-  return out.replace(/\uF8FF(\d+)\uF8FF/g, (_, i) => tokens[Number(i)]);
+  return out.replace(/(\d+)/g, (_, i) => tokens[Number(i)]);
 }
 
 const isTableSeparator = (line) =>
@@ -63,6 +63,99 @@ function splitRow(line) {
   return cells.map((c) => c.trim());
 }
 
+// ── block detectors ──────────────────────────────────────
+const isFence = (line) => /^```/.test(line.trim());
+const isHeading = (line) => /^(#{1,6})\s+/.test(line);
+const isListItem = (line) => /^\s*-\s+/.test(line);
+// A table starts where a row line (with "|") is immediately followed by a
+// separator line (e.g. "|---|---|").
+const isTableStart = (lines, i) =>
+  lines[i].includes("|") &&
+  i + 1 < lines.length &&
+  isTableSeparator(lines[i + 1]);
+
+// ── block parsers ────────────────────────────────────────
+// Each parser takes the source lines and the index of the block's first line,
+// and returns { block: html, next: index to resume scanning at }.
+
+function parseFence(lines, i) {
+  const body = [];
+  i += 1;
+  while (i < lines.length && !isFence(lines[i])) {
+    body.push(lines[i]);
+    i += 1;
+  }
+  return {
+    block: `<pre><code>${escapeHtml(body.join("\n"))}</code></pre>`,
+    next: i + 1, // skip the closing fence
+  };
+}
+
+function parseHeading(line) {
+  const [, hashes, text] = line.match(/^(#{1,6})\s+(.*)$/);
+  return `<h${hashes.length}>${renderInline(text.trim())}</h${hashes.length}>`;
+}
+
+function parseTable(lines, i) {
+  const header = splitRow(lines[i]);
+  i += 2; // header + separator
+  const bodyRows = [];
+  while (i < lines.length && lines[i].includes("|") && lines[i].trim() !== "") {
+    bodyRows.push(splitRow(lines[i]));
+    i += 1;
+  }
+  const head = `<tr>${header.map((c) => `<th>${renderInline(c)}</th>`).join("")}</tr>`;
+  const body = bodyRows
+    .map(
+      (r) => `<tr>${r.map((c) => `<td>${renderInline(c)}</td>`).join("")}</tr>`,
+    )
+    .join("\n");
+  return {
+    block: `<table>\n<thead>\n${head}\n</thead>\n<tbody>\n${body}\n</tbody>\n</table>`,
+    next: i,
+  };
+}
+
+function parseList(lines, i) {
+  const items = [];
+  while (i < lines.length && isListItem(lines[i])) {
+    items.push(renderInline(lines[i].replace(/^\s*-\s+/, "")));
+    i += 1;
+  }
+  return {
+    block: `<ul>\n${items.map((it) => `<li>${it}</li>`).join("\n")}\n</ul>`,
+    next: i,
+  };
+}
+
+// A paragraph runs until a blank line or the start of any other block.
+function parseParagraph(lines, i) {
+  const para = [lines[i]];
+  i += 1;
+  while (
+    i < lines.length &&
+    lines[i].trim() !== "" &&
+    !isFence(lines[i]) &&
+    !isHeading(lines[i]) &&
+    !isListItem(lines[i]) &&
+    !isTableStart(lines, i)
+  ) {
+    para.push(lines[i]);
+    i += 1;
+  }
+  return { block: `<p>${renderInline(para.join(" ").trim())}</p>`, next: i };
+}
+
+// Dispatch the block starting at line `i` to its parser.
+function parseBlock(lines, i) {
+  const line = lines[i];
+  if (isFence(line)) return parseFence(lines, i);
+  if (isHeading(line)) return { block: parseHeading(line), next: i + 1 };
+  if (isTableStart(lines, i)) return parseTable(lines, i);
+  if (isListItem(line)) return parseList(lines, i);
+  return parseParagraph(lines, i);
+}
+
 /**
  * Render a Markdown string to an HTML string.
  * @param {string} src Markdown source
@@ -74,97 +167,13 @@ export function renderMarkdown(src) {
   let i = 0;
 
   while (i < lines.length) {
-    const line = lines[i];
-
-    if (line.trim() === "") {
+    if (lines[i].trim() === "") {
       i += 1;
       continue;
     }
-
-    // Fenced code block
-    if (/^```/.test(line.trim())) {
-      const body = [];
-      i += 1;
-      while (i < lines.length && !/^```/.test(lines[i].trim())) {
-        body.push(lines[i]);
-        i += 1;
-      }
-      i += 1; // closing fence
-      blocks.push(`<pre><code>${escapeHtml(body.join("\n"))}</code></pre>`);
-      continue;
-    }
-
-    // Heading
-    const heading = line.match(/^(#{1,6})\s+(.*)$/);
-    if (heading) {
-      const level = heading[1].length;
-      blocks.push(`<h${level}>${renderInline(heading[2].trim())}</h${level}>`);
-      i += 1;
-      continue;
-    }
-
-    // Table: a row line followed by a separator line
-    if (
-      line.includes("|") &&
-      i + 1 < lines.length &&
-      isTableSeparator(lines[i + 1])
-    ) {
-      const header = splitRow(line);
-      i += 2; // header + separator
-      const bodyRows = [];
-      while (
-        i < lines.length &&
-        lines[i].includes("|") &&
-        lines[i].trim() !== ""
-      ) {
-        bodyRows.push(splitRow(lines[i]));
-        i += 1;
-      }
-      const head = `<tr>${header.map((c) => `<th>${renderInline(c)}</th>`).join("")}</tr>`;
-      const body = bodyRows
-        .map(
-          (r) =>
-            `<tr>${r.map((c) => `<td>${renderInline(c)}</td>`).join("")}</tr>`,
-        )
-        .join("\n");
-      blocks.push(
-        `<table>\n<thead>\n${head}\n</thead>\n<tbody>\n${body}\n</tbody>\n</table>`,
-      );
-      continue;
-    }
-
-    // Unordered list
-    if (/^\s*-\s+/.test(line)) {
-      const items = [];
-      while (i < lines.length && /^\s*-\s+/.test(lines[i])) {
-        items.push(renderInline(lines[i].replace(/^\s*-\s+/, "")));
-        i += 1;
-      }
-      blocks.push(
-        `<ul>\n${items.map((it) => `<li>${it}</li>`).join("\n")}\n</ul>`,
-      );
-      continue;
-    }
-
-    // Paragraph: gather following non-blank, non-block lines
-    const para = [line];
-    i += 1;
-    while (
-      i < lines.length &&
-      lines[i].trim() !== "" &&
-      !/^```/.test(lines[i].trim()) &&
-      !/^(#{1,6})\s+/.test(lines[i]) &&
-      !/^\s*-\s+/.test(lines[i]) &&
-      !(
-        lines[i].includes("|") &&
-        i + 1 < lines.length &&
-        isTableSeparator(lines[i + 1])
-      )
-    ) {
-      para.push(lines[i]);
-      i += 1;
-    }
-    blocks.push(`<p>${renderInline(para.join(" ").trim())}</p>`);
+    const { block, next } = parseBlock(lines, i);
+    blocks.push(block);
+    i = next;
   }
 
   return blocks.join("\n");
