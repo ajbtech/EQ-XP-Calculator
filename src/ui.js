@@ -18,6 +18,7 @@ import {
 import { fmtNum, fmtMins } from "./format.js";
 import { loadZems, continentGroups, zemForZone, zemRange } from "./data.js";
 import { renderMarkdown } from "./markdown.js";
+import { rowNotices } from "./notices.js";
 import {
   STORAGE_KEY,
   defaultState,
@@ -142,97 +143,96 @@ function compute() {
 }
 
 // ── refresh: rewrite only derived cells + summaries ──────
-function refresh() {
-  const { zem, activeIdx, party, result, shares } = compute();
-  const dash = "—";
+const DASH = "—";
 
+// Blank every derived cell of an empty / unfilled party row.
+function clearRow(r) {
+  r.sh.textContent = DASH;
+  r.gk.textContent = DASH;
+  r.gp.textContent = DASH;
+  r.xr.textContent = DASH;
+  r.xc.textContent = DASH;
+  r.kl.textContent = DASH;
+  r.tm.textContent = DASH;
+  r.gk.title = "";
+}
+
+// Render one active member's derived cells from its computed kills result.
+function renderRow(r, player, sharePct) {
+  r.sh.textContent = sharePct.toFixed(0) + "%";
+
+  r.gk.textContent = "+" + fmtNum(player.xpPerKill) + " XP";
+  const notices = rowNotices(player);
+  if (notices.length) {
+    r.gk.appendChild(el("span", { class: "cap-flag" }, " *"));
+    r.gk.title = notices.join("\n");
+  } else {
+    r.gk.title = "";
+  }
+
+  r.gp.textContent =
+    player.remaining > 0
+      ? ((player.xpPerKill / player.remaining) * 100).toFixed(2) + "%"
+      : DASH;
+
+  r.xr.textContent = fmtNum(player.remaining) + " XP";
+  r.xc.textContent = fmtNum(player.character.xpToNextLevel) + " XP";
+
+  if (Number.isFinite(player.kills)) {
+    r.kl.textContent = fmtNum(player.kills);
+    r.tm.textContent = fmtMins(player.kills * state.enc.minutesPerKill);
+  } else {
+    r.kl.textContent = "— *";
+    r.tm.textContent = "— *";
+  }
+}
+
+function renderRows(activeIdx, result, shares) {
   state.party.forEach((c, i) => {
     const r = refs.rows[i];
     r.rowEl.classList.toggle("row-dim", !isFilled(c));
     const k = activeIdx.indexOf(i);
     const player = result && k >= 0 ? result.players[k] : null;
-
     if (!player) {
-      r.sh.textContent = dash;
-      r.gk.textContent = dash;
-      r.gp.textContent = dash;
-      r.xr.textContent = dash;
-      r.xc.textContent = dash;
-      r.kl.textContent = dash;
-      r.tm.textContent = dash;
-      r.gk.title = "";
+      clearRow(r);
       return;
     }
-
-    const share = shares[k].share * 100;
-    r.sh.textContent = share.toFixed(0) + "%";
-
-    r.gk.textContent = "+" + fmtNum(player.xpPerKill) + " XP";
-    const notices = [];
-    if (player.capApplied)
-      notices.push("* 11% per-mob cap applied — excess XP is lost");
-    if (!player.eligible)
-      notices.push(
-        "* Character is too far below the highest party member to receive XP",
-      );
-    if (player.xpPerKill === 0 && player.eligible)
-      notices.push(
-        "* Mob cons green to the highest party member — no XP awarded",
-      );
-    if (notices.length) {
-      r.gk.appendChild(el("span", { class: "cap-flag" }, " *"));
-      r.gk.title = notices.join("\n");
-    } else {
-      r.gk.title = "";
-    }
-
-    r.gp.textContent =
-      player.remaining > 0
-        ? ((player.xpPerKill / player.remaining) * 100).toFixed(2) + "%"
-        : dash;
-
-    r.xr.textContent = fmtNum(player.remaining) + " XP";
-    r.xc.textContent = fmtNum(player.character.xpToNextLevel) + " XP";
-
-    if (Number.isFinite(player.kills)) {
-      r.kl.textContent = fmtNum(player.kills);
-      r.tm.textContent = fmtMins(player.kills * state.enc.minutesPerKill);
-    } else {
-      r.kl.textContent = "— *";
-      r.tm.textContent = "— *";
-    }
+    renderRow(r, player, shares[k].share * 100);
   });
+}
 
-  // Totals row.
-  const activeN = activeIdx.length;
+function renderTotals(activeN, result) {
   refs.totals.nm.textContent = `party ${activeN}/6`;
-  refs.totals.sh.textContent = result ? "100%" : "—";
+  refs.totals.sh.textContent = result ? "100%" : DASH;
   refs.totals.gk.textContent = result
     ? "+" + fmtNum(result.total) + " XP"
-    : "—";
+    : DASH;
+}
 
-  // Encounter ZEM readout.
-  const zemOk = Number.isFinite(zem) && zem > 0;
-  refs.enc.zemValue.textContent = zemOk ? String(zem) : "—";
+function renderEncounterReadout(zem, zemOk) {
+  refs.enc.zemValue.textContent = zemOk ? String(zem) : DASH;
   refs.enc.zemRel.textContent = zemOk
     ? `×${(zem / zems.baseline).toFixed(2)} vs normal (${zems.baseline}) · est.`
     : "unknown zone";
   refs.enc.zoneZem.textContent = `(${zemForZone(zems, state.enc.zoneName) ?? "?"})`;
+}
 
-  // Consider readout (highest-level member vs mob) — actual con message, in
-  // the matching EverQuest con color.
-  const con = party ? consider(party.maxLevel, state.enc.mobLevel) : null;
-  if (con) {
-    const trivial = con.xpModifier === 0 ? " — trivial, no XP" : "";
-    const pct = ` (${Math.round(con.xpModifier * 100)}%)`;
-    refs.enc.con.textContent = con.text + trivial + pct;
-    refs.enc.con.className = "con-readout con-" + con.color.toLowerCase();
-  } else {
+// Consider readout (highest-level member vs mob) — actual con message, in the
+// matching EverQuest con color.
+function renderConsider(con) {
+  if (!con) {
     refs.enc.con.textContent = "";
     refs.enc.con.className = "con-readout";
+    return;
   }
+  const trivial = con.xpModifier === 0 ? " — trivial, no XP" : "";
+  const pct = ` (${Math.round(con.xpModifier * 100)}%)`;
+  refs.enc.con.textContent = con.text + trivial + pct;
+  refs.enc.con.className = "con-readout con-" + con.color.toLowerCase();
+}
 
-  // Group bonus cells — text and active highlight track the era toggle.
+// Group bonus cells — text and active highlight track the era toggle.
+function renderGroupBonus(activeN) {
   refs.bonusCells.forEach((cell, idx) => {
     const n = idx + 1;
     cell.textContent = "×" + groupBonus(n, state.enc.penaltiesOn).toFixed(2);
@@ -241,25 +241,41 @@ function refresh() {
   refs.enc.bonusNote.textContent = activeN
     ? `${activeN} active → ×${groupBonus(Math.min(activeN, 6), state.enc.penaltiesOn).toFixed(2)} multiplier`
     : "no active members";
+}
 
-  // Constants — base XP at the normal ZEM (75), the selected ZEM, then after
-  // the consider modifier.
+// Constants — base XP at the normal ZEM (75), the selected ZEM, then after the
+// consider modifier.
+function renderConstants(con, zem, zemOk, activeN, result) {
   refs.constants.baseNorm.textContent = fmtNum(
     mobXp(state.enc.mobLevel, zems.baseline),
   );
   const baseZem = zemOk ? mobXp(state.enc.mobLevel, zem) : NaN;
-  refs.constants.baseZem.textContent = zemOk ? fmtNum(baseZem) : "—";
+  refs.constants.baseZem.textContent = zemOk ? fmtNum(baseZem) : DASH;
   refs.constants.baseZemKey.textContent = `base_xp @ ${zemOk ? zem : "?"} ZEM`;
   refs.constants.baseCon.textContent =
-    zemOk && con ? fmtNum(baseZem * con.xpModifier) : "—";
+    zemOk && con ? fmtNum(baseZem * con.xpModifier) : DASH;
   refs.constants.conMod.textContent = con
     ? "×" + con.xpModifier.toFixed(2)
-    : "—";
+    : DASH;
   refs.constants.size.textContent = String(activeN);
   refs.constants.bonus.textContent = activeN
     ? "×" + groupBonus(Math.min(activeN, 6), state.enc.penaltiesOn).toFixed(2)
-    : "—";
-  refs.constants.party.textContent = result ? fmtNum(result.total) : "—";
+    : DASH;
+  refs.constants.party.textContent = result ? fmtNum(result.total) : DASH;
+}
+
+function refresh() {
+  const { zem, activeIdx, party, result, shares } = compute();
+  const activeN = activeIdx.length;
+  const zemOk = Number.isFinite(zem) && zem > 0;
+  const con = party ? consider(party.maxLevel, state.enc.mobLevel) : null;
+
+  renderRows(activeIdx, result, shares);
+  renderTotals(activeN, result);
+  renderEncounterReadout(zem, zemOk);
+  renderConsider(con);
+  renderGroupBonus(activeN);
+  renderConstants(con, zem, zemOk, activeN, result);
 
   saveToStorage();
 }
