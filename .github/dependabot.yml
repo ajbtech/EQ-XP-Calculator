@@ -1,0 +1,36 @@
+# Dependabot keeps this repo's tooling current and opens PRs for security
+# advisories. Everything here is dev-only: the shipped static site has no
+# runtime dependencies, and nothing in node_modules reaches the browser.
+version: 2
+
+updates:
+  # Dev tooling (eslint, prettier) and their transitive dependencies.
+  # Grouped so routine bumps arrive as one PR a week rather than four.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps
+      include: scope
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+
+  # Workflow actions for CI (test.yml) and Pages deploys (deploy.yml).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci
+    groups:
+      github-actions:
+        patterns:
+          - "*"
